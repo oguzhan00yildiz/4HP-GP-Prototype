@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    const float WALK_SPEED = 5.0f;
     private Vector2 _nextMovement;
     private Rigidbody2D _rb;
+
+    private Transform _model;
 
     // Start is called before the first frame update
     void Start()
@@ -15,12 +16,19 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogWarning("Player rigidbody is null, you stupid idiot!!");
         }
+
+        _model = GameObject.FindWithTag("PlayerModel").transform;
     }
 
     // Update is called once per frame
     void Update()
     {
         UpdateMovement();
+
+        if(Input.GetKey(KeyCode.R))
+        {
+            _model.Rotate(500 * Time.deltaTime * -Vector3.forward);
+        }
     }
 
     void UpdateMovement()
@@ -41,8 +49,8 @@ public class PlayerMovement : MonoBehaviour
             + screenRight * input.x
             + screenUp * input.y).normalized;
 
-        // Multiply movement vector by walk speed and normalize to frame time
-        screenMovement *= WALK_SPEED;
+        // Multiply movement vector by walk speed
+        screenMovement *= Const.Player.WALK_SPEED;
 
         // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
         if(input.magnitude <= 0)
@@ -60,7 +68,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Cast to Vector2 required for transform.position change
+        // Cast to Vector2 required for transform.position change (for whatever reason)
         _rb.MovePosition((Vector2)transform.position + _nextMovement * Time.fixedDeltaTime);
     }
 }
