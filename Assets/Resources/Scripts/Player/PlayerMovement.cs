@@ -1,20 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     const float WALK_SPEED = 5.0f;
-    private CharacterController _cc;
-    private Transform _trans;
     private Vector2 _nextMovement;
-    private Quaternion _targetRot;
 
     // Start is called before the first frame update
     void Start()
     {
-        _cc = GetComponent<CharacterController>();
-        _trans = transform;
+
     }
 
     // Update is called once per frame
