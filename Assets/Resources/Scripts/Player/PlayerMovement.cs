@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Transform _model;
     private SpriteRenderer _modelRenderer;
+    private Animator anim;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
         _model = GameObject.FindWithTag("PlayerModel").transform;
 
         _modelRenderer = _model.GetComponentInChildren<SpriteRenderer>();
+
+        anim = _model.GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -63,11 +66,18 @@ public class PlayerMovement : MonoBehaviour
         if (input.magnitude <= 0)
         {
             _nextMovement = Vector2.Lerp(_nextMovement, Vector2.zero, Time.deltaTime * 15.0f);
+
+            //triggering animation on
+            anim.SetBool("IsMoving", false);
+            
         }
         else
         {
             // Else lerp the next movement towards the current desired movement (smooth acceleration)
             _nextMovement = Vector2.Lerp(_nextMovement, screenMovement, Time.deltaTime * 25.0f);
+
+            //triggering animation off
+            anim.SetBool("IsMoving", true);
         }
 
         // Movement updates happen in FixedUpdate since Unity physics run in that timeframe
