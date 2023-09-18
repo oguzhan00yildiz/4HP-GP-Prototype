@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D _rb;
 
     private Transform _model;
+    private SpriteRenderer _modelRenderer;
 
     // Start is called before the first frame update
     void Start()
@@ -18,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         _model = GameObject.FindWithTag("PlayerModel").transform;
+
+        _modelRenderer = _model.GetComponentInChildren<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -25,9 +28,10 @@ public class PlayerMovement : MonoBehaviour
     {
         UpdateMovement();
 
-        if(Input.GetKey(KeyCode.R))
+        // Debug key
+        if(Input.GetKeyDown(KeyCode.R))
         {
-            _model.Rotate(500 * Time.deltaTime * -Vector3.forward);
+            ProjectileManager.CreateProjectile(transform.position, Vector2.zero, Color.blue);
         }
     }
 
@@ -52,8 +56,11 @@ public class PlayerMovement : MonoBehaviour
         // Multiply movement vector by walk speed
         screenMovement *= Const.Player.WALK_SPEED;
 
+        // Flip player sprite depending on direction
+        _modelRenderer.flipX = input.x < 0;
+
         // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
-        if(input.magnitude <= 0)
+        if (input.magnitude <= 0)
         {
             _nextMovement = Vector2.Lerp(_nextMovement, Vector2.zero, Time.deltaTime * 15.0f);
         }
