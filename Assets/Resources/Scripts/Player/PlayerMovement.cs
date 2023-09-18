@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
         screenMovement *= Const.Player.WALK_SPEED;
 
         // Flip player sprite depending on direction
-        _modelRenderer.flipX = input.x < 0;
+        _modelRenderer.flipX = _nextMovement.x < 0;
 
         // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
         if (input.magnitude <= 0)
