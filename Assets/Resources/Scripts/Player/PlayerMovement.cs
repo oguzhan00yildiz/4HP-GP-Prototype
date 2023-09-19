@@ -30,12 +30,6 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         UpdateMovement();
-
-        // Debug key
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            ProjectileManager.CreateProjectile(transform.position, Vector2.zero, Color.blue);
-        }
     }
 
     void UpdateMovement()
@@ -60,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
         screenMovement *= Const.Player.WALK_SPEED;
 
         // Flip player sprite depending on direction
-        _modelRenderer.flipX = input.x < 0;
+        _modelRenderer.flipX = _nextMovement.x < 0;
 
         // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
         if (input.magnitude <= 0)
