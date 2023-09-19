@@ -30,12 +30,6 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         UpdateMovement();
-
-        // Debug key
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            ProjectileManager.CreateProjectile(transform.position, Vector2.zero, Color.blue);
-        }
     }
 
     void UpdateMovement()
