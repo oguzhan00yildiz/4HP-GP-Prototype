@@ -2,30 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+namespace Player
 {
-    private PlayerMovement _movement;
-    private Camera _playerCam;
-    private CameraMouseLook _mouseLook;
-
-    private int _health;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Player : MonoBehaviour
     {
-        Initialize();
-    }
+        public static Player instance { get; private set; }
+        public PlayerMovement Movement { get; private set; }
+        public PlayerAttackHandler AttackHandler { get; private set; }
+        public CameraMouseLook MouseLook { get; private set; }
+        public Camera Camera;
+        public int Health { get; private set; }
 
-    void Initialize()
-    {
-        _movement = GetComponent<PlayerMovement>();
-        _playerCam = GameObject.FindWithTag("PlayerCamera").GetComponent<Camera>();
-        _mouseLook = _playerCam.GetComponent<CameraMouseLook>();
-    }
+        // Make sure singleton is functional to access public variables of
+        // this player instance outside this class (such as in PlayerMovement, PlayerAttackHandler...)
+        private void OnEnable()
+        {
+            if (instance != this && instance != null)
+                Destroy(this);
+            else
+                instance = this;
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // Start is called before the first frame update
+        void Start()
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            Movement = GetComponent<PlayerMovement>();
+            AttackHandler = GetComponent<PlayerAttackHandler>();
+            Camera = GameObject.FindWithTag("PlayerCamera").GetComponent<Camera>();
+            MouseLook = Camera.GetComponent<CameraMouseLook>();
+        }
     }
 }

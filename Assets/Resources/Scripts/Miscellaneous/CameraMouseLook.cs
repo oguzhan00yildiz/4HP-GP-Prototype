@@ -10,6 +10,7 @@ public class CameraMouseLook : MonoBehaviour
     [SerializeField] private float _lerpFactor;
     private Vector2 _mouseScreenPos;
     private Vector2 _camWorldPos;
+    public Vector2 MouseScreenPosition { get; private set; }
 
     // Update is called once per frame
     void Update()
@@ -28,6 +29,8 @@ public class CameraMouseLook : MonoBehaviour
         Vector2 targetPos = (Vector2)_center.position
             + Vector2.right * Mathf.Clamp(_mouseScreenPos.x * _maxDistance, -_maxDistance, _maxDistance)
             + Vector2.up * Mathf.Clamp(_mouseScreenPos.y * _maxDistance, -_maxDistance, _maxDistance);
+
+        MouseScreenPosition = targetPos.normalized;
 
         // Convert to 3D position and find original Z offset
         Vector3 targetPos3d = (Vector3)targetPos;
