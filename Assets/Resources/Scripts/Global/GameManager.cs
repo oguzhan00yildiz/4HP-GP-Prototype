@@ -22,8 +22,10 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    public float elapsedTime;
+    [HideInInspector] public float elapsedTime;
     private float startTime;
+
+    public int killedEnemies;
 
     private void Awake()
     {
@@ -45,5 +47,10 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         elapsedTime = Time.time - startTime;
+    }
+
+    public void EnemyKilled()
+    {
+        killedEnemies++;
     }
 }
