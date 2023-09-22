@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PlayerModel
   - PlayerCamera
+  - Canvas
   layers:
   - Default
   - TransparentFX

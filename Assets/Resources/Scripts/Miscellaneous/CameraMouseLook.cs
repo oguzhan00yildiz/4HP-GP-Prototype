@@ -11,6 +11,12 @@ public class CameraMouseLook : MonoBehaviour
     private Vector2 _mouseScreenPos;
     private Vector2 _camWorldPos;
     public Vector2 MouseScreenPosition { get; private set; }
+    public CameraShake Shaker { get; private set; }
+
+    private void Start()
+    {
+        Shaker = GetComponent<CameraShake>();
+    }
 
     // Update is called once per frame
     void Update()

@@ -15,6 +15,8 @@ namespace Player
         public bool Attacking { get; private set; }
 
         private Animator _attackAnimator;
+
+        // This is a cached reference to a prefab
         private static GameObject _meleeEffect;
         [SerializeField]
         private float _attackRate = 0.15f;
@@ -32,6 +34,14 @@ namespace Player
             if (Player.instance.Movement.AttackHeld)
             {
                 TryAttack();
+                Attacking = true;
+            }
+            else
+                Attacking = false;
+
+            if(Input.GetKeyDown(KeyCode.K))
+            {
+                Player.instance.TakeDamage(0);
             }
         }
         void TryAttack()
@@ -61,7 +71,6 @@ namespace Player
 
                 CreateMeleeEffect(flipX: false);
             }
-            Attacking = true;
         }
 
         void CreateMeleeEffect(bool flipX)
