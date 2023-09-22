@@ -2,30 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+namespace Player
 {
-    private PlayerMovement _movement;
-    private Camera _playerCam;
-    private CameraMouseLook _mouseLook;
-
-    private int _health;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Player : MonoBehaviour
     {
-        Initialize();
-    }
+        public static Player instance { get; private set; }
+        public PlayerMovement Movement { get; private set; }
+        public PlayerAttackHandler AttackHandler { get; private set; }
+        public CameraMouseLook MouseLook { get; private set; }
+        public Camera Camera { get; private set; }
+        public int Health { get; private set; }
+        public Canvas Canvas { get; private set; }
 
-    void Initialize()
-    {
-        _movement = GetComponent<PlayerMovement>();
-        _playerCam = GameObject.FindWithTag("PlayerCamera").GetComponent<Camera>();
-        _mouseLook = _playerCam.GetComponent<CameraMouseLook>();
-    }
+        // Make sure singleton is functional to access public variables of
+        // this player instance outside this class (such as in PlayerMovement, PlayerAttackHandler...)
+        private void OnEnable()
+        {
+            if (instance != this && instance != null)
+                Destroy(this);
+            else
+                instance = this;
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void TakeDamage(int amount)
+        {
+            // Shake camera
+            CameraShake shaker = Player.instance.Camera.GetComponent<CameraShake>();
+            shaker.Shake(0.25f, 0.1f);
+
+            // Find damage overlay effect
+            DamageScreenEffect dmgFx =
+                Canvas.transform.Find("GameView/DamageOverlay")
+                .GetComponent<DamageScreenEffect>();
+
+            // Show flash if not null
+            dmgFx?.ShowDamageFlash(true);
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            Movement = GetComponent<PlayerMovement>();
+            AttackHandler = GetComponent<PlayerAttackHandler>();
+            Camera = GameObject.FindWithTag("PlayerCamera").GetComponent<Camera>();
+            MouseLook = Camera.GetComponent<CameraMouseLook>();
+            Canvas = GameObject.FindWithTag("Canvas").GetComponent<Canvas>();
+        }
     }
 }
