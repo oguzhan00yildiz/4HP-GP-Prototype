@@ -71,21 +71,18 @@ namespace Assets.Resources.Scripts.Enemies
             List<GameObject> generatedEnemies = new();
 
             // Chooses enemies at random from the available ones, until the budget is spent or enemies cap reached
-            while (_waveValue > 0 && _enemiesToSpawn.Count < MaxEnemiesPerRound)
+            while (availableEnemies.Count != 0 && _enemiesToSpawn.Count < MaxEnemiesPerRound)
             {
-                if (availableEnemies.Count == 0)
-                    break;
-
                 var randEnemyId = Random.Range(0, availableEnemies.Count);
                 var randEnemyCost = availableEnemies[randEnemyId].enemyCost;
 
-                if (_waveValue - randEnemyCost < 0)
-                    availableEnemies.Remove(availableEnemies[randEnemyId]);
-                else
+                if (_waveValue - randEnemyCost > 0)
                 {
                     generatedEnemies.Add(availableEnemies[randEnemyId].enemyPrefab);
                     _waveValue -= randEnemyCost;
                 }
+                else
+                 availableEnemies.Remove(availableEnemies[randEnemyId]);
             }
 
             _enemiesToSpawn.Clear();
