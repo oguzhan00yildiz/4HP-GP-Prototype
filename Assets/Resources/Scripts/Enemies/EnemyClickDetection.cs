@@ -16,6 +16,11 @@ namespace Assets.Resources.Scripts.Enemies
         {
             if (!Input.GetMouseButtonDown(0)) return; // Check if mouse has been clicked
 
+            CheckIfEnemyClicked();
+        }
+
+        private void CheckIfEnemyClicked()
+        {
             var mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
             var hitInfo = Physics2D.Raycast(mousePosition, Vector2.zero);
 

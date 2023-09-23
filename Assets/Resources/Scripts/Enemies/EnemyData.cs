@@ -20,5 +20,11 @@ namespace Assets.Resources.Scripts.Enemies
         [Header("References")]
         public GameObject enemyPrefab;
         public Slider enemyHealthBar;
+
+        void Start()
+        {
+            enemyHealthBar.maxValue = enemyHealth;
+            enemyHealthBar.value = enemyHealth;
+        }
     }
 }

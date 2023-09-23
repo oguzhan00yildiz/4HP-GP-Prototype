@@ -70,7 +70,7 @@ namespace Assets.Resources.Scripts.Enemies
             
             List<GameObject> generatedEnemies = new();
 
-            // Chooses enemies at random from the available ones, until the budget is spent or enemies cap reached
+            // Chooses enemies at random from the available ones, until there are no more enemies available or enemies cap reached
             while (availableEnemies.Count != 0 && _enemiesToSpawn.Count < MaxEnemiesPerRound)
             {
                 var randEnemyId = Random.Range(0, availableEnemies.Count);
@@ -89,27 +89,30 @@ namespace Assets.Resources.Scripts.Enemies
             _enemiesToSpawn = generatedEnemies;
         }
 
-        // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
-        private void SpawnEnemy() 
+        // This method returns a random spawn point so for SpawnEnemy() to use
+        private Vector3 PickRandomSpawnPoint()
         {
             // Calculate random angle in radians
             var angle = Random.Range(0f, 2f * Mathf.PI);
 
             // Calculate spawn position in a circle around the player
-            var spawnX = _player.transform.position.x + SpawnRadius * Mathf.Cos(angle); 
+            var spawnX = _player.transform.position.x + SpawnRadius * Mathf.Cos(angle);
             var spawnY = _player.transform.position.y + SpawnRadius * Mathf.Sin(angle);
 
-            var spawnPosition = new Vector3(spawnX, spawnY, 0f);
+            return new Vector3(spawnX, spawnY, 0f);
+        }
 
+        // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
+        private void SpawnEnemy() 
+        {
             if (_enemiesToSpawn.Count <= 0) return;
 
             // Spawning the list of enemies that has been generated
-            Instantiate(_enemiesToSpawn[0], spawnPosition, Quaternion.identity);
-            _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealthBar.maxValue = _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealth;
-            _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealthBar.value = _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealth;
+            Instantiate(_enemiesToSpawn[0], PickRandomSpawnPoint(), Quaternion.identity);
             _enemiesToSpawn.RemoveAt(0);
         }
 
+        // Restarts the spawning cycle
         private void StartNextWave()
         {
             currentWave++;

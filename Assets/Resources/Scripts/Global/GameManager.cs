@@ -53,6 +53,13 @@ namespace Assets.Resources.Scripts.Global
             if (remainingHealth <= 0) { EnemyKilled(enemyHit); }
         }
 
+        // Kills the enemy
+        public void EnemyKilled(EnemyData enemyKilled)
+        {
+            Destroy(enemyKilled.gameObject);
+            killedEnemies++;
+        }
+
         // Updates the health bar to the new value with a smooth animation
         private IEnumerator UpdateHealthBar(EnemyData enemyHit, int initialHealth, float targetHealthRatio)
         {
@@ -67,13 +74,6 @@ namespace Assets.Resources.Scripts.Global
             }
 
             enemyHit.enemyHealthBar.value = targetHealthRatio;
-        }
-
-        // Kills the enemy
-        public void EnemyKilled(EnemyData enemyKilled)
-        {
-            Destroy(enemyKilled.gameObject);
-            killedEnemies++;
         }
     }
 }
