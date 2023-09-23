@@ -63,13 +63,26 @@ namespace Player
             // Multiply movement vector by walk speed
             screenMovement *= Const.Player.WALK_SPEED;
 
-            // Player should face left if they are trying to move left BUT are not attacking
-            bool facesLeft = _nextMovement.x < 0;
-            if (!Player.instance.AttackHandler.Attacking)
-                SetFacing(facesLeft);
-
             // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
             bool moving = input.magnitude > 0;
+
+            // Player should face left if they are trying to move left BUT are not attacking
+            bool facesLeft = _nextMovement.x < 0;
+            if (!Player.instance.AttackHandler.Attacking && moving)
+                SetFacing(facesLeft);
+
+            // Player is backtracking if facing left but moving right or vice versa
+            bool backTracking =
+                (FacingLeft && _nextMovement.x > 0)
+                || (!FacingLeft && _nextMovement.x < 0);
+
+            // Reverse animation (multiply animation speed by -1) if backtracking
+            if(backTracking)
+            {
+                _playerAnim.SetFloat("MoveSpeed", -1);
+            }
+            else
+                _playerAnim.SetFloat("MoveSpeed", 1);
 
             // Ossi! Simplified expression to set animator bool equal to this bool's value
             _playerAnim.SetBool("IsMoving", moving);
@@ -90,7 +103,7 @@ namespace Player
 
         private void FixedUpdate()
         {
-            // Cast to Vector2 required for transform.position change (for whatever reason)
+            // Cast to Vector2 required for transform.position change since _rb is rigidbody2D
             _rb.MovePosition((Vector2)transform.position + _nextMovement * Time.fixedDeltaTime);
         }
 
