@@ -6,7 +6,7 @@ TagManager:
   tags:
   - PlayerModel
   - PlayerCamera
-  - Canvas
+  - Enemy
   layers:
   - Default
   - TransparentFX
