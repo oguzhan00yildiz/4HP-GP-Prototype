@@ -1,30 +1,30 @@
+using Assets.Resources.Scripts.Global;
 using UnityEngine;
 
-public class EnemyClickDetection : MonoBehaviour
+namespace Assets.Resources.Scripts.Enemies
 {
-    private Camera mainCamera;
-
-    private void Start()
+    public class EnemyClickDetection : MonoBehaviour
     {
-        mainCamera = GetComponent<Camera>();
-    }
+        private Camera _mainCamera;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0)) // Check for left mouse button click
+        private void Start()
         {
-            Vector2 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hitInfo = Physics2D.Raycast(mousePosition, Vector2.zero);
+            _mainCamera = GetComponent<Camera>();
+        }
 
-            if (hitInfo.collider != null)
-            {
-                if (hitInfo.collider.CompareTag("Enemy"))
-                {
-                    GameObject enemy = hitInfo.collider.gameObject;
-                    Destroy(enemy);
-                    GameManager.Instance.EnemyKilled();
-                }
-            }
+        private void Update()
+        {
+            if (!Input.GetMouseButtonDown(0)) return; // Check if mouse has been clicked
+
+            var mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            var hitInfo = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+            if (hitInfo.collider == null) return; // Check if something has been hit
+
+            if (!hitInfo.collider.CompareTag("Enemy")) return; // Check if enemy has been hit
+
+            var enemy = hitInfo.collider.gameObject.GetComponent<EnemyData>();
+            GameManager.Instance.EnemyHit(enemy, 10);
         }
     }
 }

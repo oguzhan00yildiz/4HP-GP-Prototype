@@ -1,19 +1,18 @@
+using Assets.Resources.Scripts.Enemies;
 using TMPro;
 using UnityEngine;
 
-public class CanvasManager : MonoBehaviour
+namespace Assets.Resources.Scripts.Global
 {
-    [SerializeField] private TMP_Text waveText;
-    [SerializeField] private TMP_Text enemyCounter;
-
-    private void Start()
+    public class CanvasManager : MonoBehaviour
     {
+        [SerializeField] private TMP_Text _waveText;
+        [SerializeField] private TMP_Text enemyCounter;
 
-    }
-
-    private void Update()
-    {
-        waveText.text = "Wave " + FindAnyObjectByType<SpawnerManager>().currentWave.ToString();
-        enemyCounter.text = "Enemy killed: " + GameManager.Instance.killedEnemies.ToString();
+        private void Update()
+        {
+            _waveText.text = "Wave " + FindAnyObjectByType<SpawnerManager>().currentWave.ToString();
+            enemyCounter.text = "Enemy killed: " + GameManager.Instance.killedEnemies.ToString();
+        }
     }
 }

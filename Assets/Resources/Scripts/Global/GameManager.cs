@@ -1,56 +1,79 @@
+using System.Collections;
+using Assets.Resources.Scripts.Enemies;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+namespace Assets.Resources.Scripts.Global
 {
-    #region Singleton
-    private static GameManager instance;
-    public static GameManager Instance
+    public class GameManager : MonoBehaviour
     {
-        get
+        #region Singleton
+        private static GameManager instance;
+        public static GameManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = FindObjectOfType<GameManager>();
+                    if (instance == null)
+                    {
+                        GameObject obj = new GameObject("GameManager");
+                        instance = obj.AddComponent<GameManager>();
+                    }
+                }
+                return instance;
+            }
+        }
+        #endregion
+
+        public int killedEnemies;
+        private const float HealthBarTransitionDuration = .1f;
+
+        private void Awake()
         {
             if (instance == null)
             {
-                instance = FindObjectOfType<GameManager>();
-                if (instance == null)
-                {
-                    GameObject obj = new GameObject("GameManager");
-                    instance = obj.AddComponent<GameManager>();
-                }
+                instance = this;
+                DontDestroyOnLoad(gameObject);
             }
-            return instance;
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-    }
-    #endregion
 
-    [HideInInspector] public float elapsedTime;
-    private float startTime;
-
-    public int killedEnemies;
-
-    private void Awake()
-    {
-        if (instance == null)
+        // Deals damage to the enemy hit
+        public void EnemyHit(EnemyData enemyHit, int damage)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
+            var initialHealth = enemyHit.enemyHealth;
+            var remainingHealth = enemyHit.enemyHealth -= damage;
+
+            StartCoroutine(UpdateHealthBar(enemyHit, initialHealth, remainingHealth));
+
+            if (remainingHealth <= 0) { EnemyKilled(enemyHit); }
         }
-        else
+
+        // Updates the health bar to the new value with a smooth animation
+        private IEnumerator UpdateHealthBar(EnemyData enemyHit, int initialHealth, float targetHealthRatio)
         {
-            Destroy(gameObject);
+            ;
+            var elapsedTime = 0f;
+
+            while (elapsedTime < HealthBarTransitionDuration)
+            {
+                enemyHit.enemyHealthBar.value = Mathf.Lerp(initialHealth, targetHealthRatio, elapsedTime / HealthBarTransitionDuration);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            enemyHit.enemyHealthBar.value = targetHealthRatio;
         }
-    }
 
-    private void Start()
-    {
-        startTime = Time.time;
-    }
-    private void Update()
-    {
-        elapsedTime = Time.time - startTime;
-    }
-
-    public void EnemyKilled()
-    {
-        killedEnemies++;
+        // Kills the enemy
+        public void EnemyKilled(EnemyData enemyKilled)
+        {
+            Destroy(enemyKilled.gameObject);
+            killedEnemies++;
+        }
     }
 }

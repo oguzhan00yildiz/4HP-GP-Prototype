@@ -1,124 +1,122 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class SpawnerManager : MonoBehaviour
+namespace Assets.Resources.Scripts.Enemies
 {
-    [HideInInspector] public int currentWave;
-
-    [SerializeField] private List<Enemy> enemies = new List<Enemy>();
-    [SerializeField] private float enemiesPerSecond;
-
-    private List<GameObject> enemiesToSpawn = new List<GameObject>();
-    private float spawnRadius = 15;
-    private Transform player;
-    private float nextSpawnTime;
-    private int waveValue;
-    private int maxEnemiesPerRound= 50;
-
-    void Start()
+    public class SpawnerManager : MonoBehaviour
     {
-        #region Missing Player Check
-        player = FindObjectOfType<Player>().transform;
+        [HideInInspector] public int currentWave;
 
-        if (player == null)
+        [SerializeField] private List<EnemyData> _enemies = new();
+
+        
+        private List<GameObject> _enemiesToSpawn = new();
+        private Transform _player;
+        private float _nextSpawnTime;
+        private int _waveValue;
+
+        private const float SpawnRadius = 15;
+        private const float EnemiesPerSecond = 2;
+        private const int MaxEnemiesPerRound = 50;
+
+        void Start()
         {
-            Debug.LogError("No player found.");
-            enabled = false;
-            return;
-        }
-        #endregion
+            #region Missing Player Check
 
-        CalculateWaveBudget(); // Generates the first wave
-    }
+            _player = FindObjectOfType<Player>().transform;
 
-    void Update()
-    {
-        if (Time.time >= nextSpawnTime && enemiesToSpawn.Count != 0) // Checking if we have more enemies to spawn
-        {
-            SpawnEnemy();
-            nextSpawnTime = Time.time + (1f / enemiesPerSecond);
-        }
-
-        if(enemiesToSpawn.Count == 0 && FindObjectsOfType<EnemyMovement>().Length == 0) // When enemies have been spawned AND have been killed, then we go to the next wave and start the cycle
-        {
-            StartNextWave();
-        }
-    }
-
-    void CalculateWaveBudget() // This method decides the "budget" for the wave
-    {
-        waveValue = currentWave * 10;
-        GenerateEnemies();
-    }
-
-    void GenerateEnemies() // Creates the list of enemies that then are going to be spawned according to current wave and budget
-    {
-        List<Enemy> availableEnemies = new List<Enemy>(); // Creates a list of all the spawnable enemies given the current wave
-
-        for (int i = 0; i < enemies.Count; i++) 
-        {
-            if (enemies[i].unlockingWave <= currentWave &&
-                currentWave <= enemies[i].lastSpawningWave)
+            if (_player == null)
             {
-                availableEnemies.Add(enemies[i]);
+                Debug.LogError("No player found.");
+                enabled = false;
+                return;
+            }
+
+            #endregion
+
+            // Generates the first wave
+            CalculateWaveBudget(); 
+        }
+
+        void Update()
+        {
+            // Checking if we have more enemies to spawn
+            if (Time.time >= _nextSpawnTime && _enemiesToSpawn.Count != 0) 
+            {
+                SpawnEnemy();
+                _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
+            }
+
+            // When enemies have been spawned AND have been killed, then we go to the next wave and start the cycle
+            if (_enemiesToSpawn.Count == 0 && FindObjectsOfType<EnemyMovement>().Length == 0)
+            {
+                StartNextWave();
             }
         }
 
-        List<GameObject> generatedEnemies = new List<GameObject>(); // Chooses enemies at random from the available ones, until the budget is spent or enemies cap reached
-
-        while (waveValue > 0 && enemiesToSpawn.Count < maxEnemiesPerRound)
+        // This method decides the "budget" for the wave
+        private void CalculateWaveBudget() 
         {
-            int randEnemyID = Random.Range(0, availableEnemies.Count);
-            int randEnemyCost = availableEnemies[randEnemyID].enemyCost;
-
-            if(waveValue - randEnemyCost >= 0)
-            {
-                generatedEnemies.Add(availableEnemies[randEnemyID].enemyPrefab);
-                waveValue -= randEnemyCost;
-            }
-            else if(waveValue <= 0) 
-            {
-                break;
-            }
+            _waveValue = currentWave * 10;
+            GenerateEnemies();
         }
 
-        enemiesToSpawn.Clear();
-        enemiesToSpawn = generatedEnemies;
-    }
-
-    void SpawnEnemy() // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
-    {
-        float angle = Random.Range(0f, 2f * Mathf.PI); // Calculate random angle in radians
-
-        float spawnX = player.transform.position.x + spawnRadius * Mathf.Cos(angle); // Calculate spawn position in a circle around the player
-        float spawnY = player.transform.position.y + spawnRadius * Mathf.Sin(angle); //
-
-        Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0f);
-
-        if(enemiesToSpawn.Count > 0) 
+        // Creates the list of enemies that then are going to be spawned according to current wave and budget
+        private void GenerateEnemies()
         {
-            Instantiate(enemiesToSpawn[0], spawnPosition, Quaternion.identity);
-            enemiesToSpawn.RemoveAt(0);
-        }
-    }
+            // Creates a list of all the unlocked enemies given the current wave
+            var availableEnemies = _enemies.Where(enemy => enemy.unlockingWave <= currentWave && currentWave <= enemy.lastSpawningWave).ToList();
+            
+            List<GameObject> generatedEnemies = new();
 
-    void StartNextWave()
-    {
-        currentWave++;
-        CalculateWaveBudget();
+            // Chooses enemies at random from the available ones, until the budget is spent or enemies cap reached
+            while (_waveValue > 0 && _enemiesToSpawn.Count < MaxEnemiesPerRound)
+            {
+                if (availableEnemies.Count == 0)
+                    break;
+
+                var randEnemyId = Random.Range(0, availableEnemies.Count);
+                var randEnemyCost = availableEnemies[randEnemyId].enemyCost;
+
+                if (_waveValue - randEnemyCost < 0)
+                    availableEnemies.Remove(availableEnemies[randEnemyId]);
+                else
+                {
+                    generatedEnemies.Add(availableEnemies[randEnemyId].enemyPrefab);
+                    _waveValue -= randEnemyCost;
+                }
+            }
+
+            _enemiesToSpawn.Clear();
+            _enemiesToSpawn = generatedEnemies;
+        }
+
+        // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
+        private void SpawnEnemy() 
+        {
+            // Calculate random angle in radians
+            var angle = Random.Range(0f, 2f * Mathf.PI);
+
+            // Calculate spawn position in a circle around the player
+            var spawnX = _player.transform.position.x + SpawnRadius * Mathf.Cos(angle); 
+            var spawnY = _player.transform.position.y + SpawnRadius * Mathf.Sin(angle);
+
+            var spawnPosition = new Vector3(spawnX, spawnY, 0f);
+
+            if (_enemiesToSpawn.Count <= 0) return;
+
+            // Spawning the list of enemies that has been generated
+            Instantiate(_enemiesToSpawn[0], spawnPosition, Quaternion.identity);
+            _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealthBar.maxValue = _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealth;
+            _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealthBar.value = _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealth;
+            _enemiesToSpawn.RemoveAt(0);
+        }
+
+        private void StartNextWave()
+        {
+            currentWave++;
+            CalculateWaveBudget();
+        }
     }
 }
-
-[System.Serializable]
-public class Enemy
-{
-    public string enemyName;
-    
-    [Space(10)]
-
-    public GameObject enemyPrefab;
-    public int enemyCost;
-
-    public int unlockingWave;
-    public int lastSpawningWave;
-} 

@@ -240,7 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72730170086d80541acff2f81198d7b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waveText: {fileID: 1381972979}
+  _waveText: {fileID: 1381972979}
   enemyCounter: {fileID: 550650576}
 --- !u!1 &368492160
 GameObject:
@@ -354,7 +354,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99088c9168c38a549a1459eeb587c621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elapsedTime: 0
   killedEnemies: 0
 --- !u!1 &519420028
 GameObject:
@@ -5797,23 +5796,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWave: 1
-  enemies:
-  - enemyName: Red Enemy
-    enemyPrefab: {fileID: 2980317213719450687, guid: 6a6dc62feba02184388cc7170c7074df, type: 3}
-    enemyCost: 1
-    unlockingWave: 1
-    lastSpawningWave: 2
-  - enemyName: Yellow Enemy
-    enemyPrefab: {fileID: 2980317213719450687, guid: 8b4a458419fc2a647bd88732fd1164c5, type: 3}
-    enemyCost: 2
-    unlockingWave: 2
-    lastSpawningWave: 4
-  - enemyName: Green Enemy
-    enemyPrefab: {fileID: 2980317213719450687, guid: eab78aba85d2275438dce539486482b9, type: 3}
-    enemyCost: 2
-    unlockingWave: 4
-    lastSpawningWave: 100
-  enemiesPerSecond: 2
+  _enemies:
+  - {fileID: 2448914194805704164, guid: 6a6dc62feba02184388cc7170c7074df, type: 3}
+  - {fileID: 4480335171376945700, guid: 8b4a458419fc2a647bd88732fd1164c5, type: 3}
+  - {fileID: 8680879829084787831, guid: eab78aba85d2275438dce539486482b9, type: 3}
 --- !u!4 &1526013575
 Transform:
   m_ObjectHideFlags: 0
