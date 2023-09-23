@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Player;
 
 namespace Assets.Resources.Scripts.Enemies
 {
@@ -10,7 +11,6 @@ namespace Assets.Resources.Scripts.Enemies
 
         [SerializeField] private List<EnemyData> _enemies = new();
 
-        
         private List<GameObject> _enemiesToSpawn = new();
         private Transform _player;
         private float _nextSpawnTime;
@@ -24,7 +24,7 @@ namespace Assets.Resources.Scripts.Enemies
         {
             #region Missing Player Check
 
-            _player = FindObjectOfType<Player>().transform;
+            _player = FindObjectOfType<Player.Player>().transform;
 
             if (_player == null)
             {

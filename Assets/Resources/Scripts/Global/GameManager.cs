@@ -63,7 +63,6 @@ namespace Assets.Resources.Scripts.Global
         // Updates the health bar to the new value with a smooth animation
         private IEnumerator UpdateHealthBar(EnemyData enemyHit, int initialHealth, float targetHealthRatio)
         {
-            ;
             var elapsedTime = 0f;
 
             while (elapsedTime < HealthBarTransitionDuration)
