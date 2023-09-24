@@ -22351,6 +22351,8 @@ MonoBehaviour:
   AttackOrigin: {fileID: 0}
   _attackRate: 0.15
   _meleeOverlapExtents: {x: 1, y: 0.25, z: 1}
+  damageToEnemy: 3
+  popUpPrefab: {fileID: 4367993356374614601, guid: 5d35ac3d5fbe0b643ad5b7320274548e, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
