@@ -211,6 +211,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 4
+  _stoppingDistance: 2
+  _rigidbody: {fileID: 0}
 --- !u!114 &8680879829084787831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,6 +230,7 @@ MonoBehaviour:
   enemyCost: 3
   unlockingWave: 3
   lastSpawningWave: 10
+  maxPercentageInWave: 15
   enemyPrefab: {fileID: 2980317213719450687}
   enemyHealthBar: {fileID: 1035906670830047348}
 --- !u!1 &5874443908144598415
