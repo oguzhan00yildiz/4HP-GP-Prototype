@@ -14,7 +14,7 @@ public class DamageScreenEffect : MonoBehaviour
     public void ShowDamageFlash(bool shakeCamera)
     {
         // Find these here, if in start it fucks up..
-        _shaker = Player.Player.instance.MouseLook.Shaker;
+        _shaker = PlayerLogic.Player.instance.MouseLook.Shaker;
         _overlay = GetComponent<Image>();
 
         StartCoroutine(DamageEffect());

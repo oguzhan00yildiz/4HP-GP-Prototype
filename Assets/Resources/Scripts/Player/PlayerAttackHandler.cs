@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player
+namespace PlayerLogic
 {
     public class PlayerAttackHandler : MonoBehaviour
     {
@@ -97,7 +97,6 @@ namespace Player
 
                 // TODO: Actually change the damage given depending on attack type
                 GameManager.Instance.EnemyHit(enemyData, 3);
-                Debug.LogError("JACK YOU STUPID MAFIA GYPSY");
 
                 // This is for Ossi to do
                 DisplayDamageNumber();
@@ -106,7 +105,7 @@ namespace Player
 
         private void DisplayDamageNumber()
         {
-
+            Debug.LogWarning("OSSI!!! MAKE THE DAMAGE NUMBERS SHOW!!");
         }
 
         private void OnDrawGizmos()

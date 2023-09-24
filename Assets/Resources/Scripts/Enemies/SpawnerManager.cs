@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Player;
+using PlayerLogic;
 
 namespace Assets.Resources.Scripts.Enemies
 {
@@ -24,7 +24,7 @@ namespace Assets.Resources.Scripts.Enemies
         {
             #region Missing Player Check
 
-            _player = FindObjectOfType<Player.Player>().transform;
+            _player = FindObjectOfType<PlayerLogic.Player>().transform;
 
             if (_player == null)
             {
