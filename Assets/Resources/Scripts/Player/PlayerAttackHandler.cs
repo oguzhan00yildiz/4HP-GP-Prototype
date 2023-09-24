@@ -1,8 +1,10 @@
+using Assets.Resources.Scripts.Enemies;
+using Assets.Resources.Scripts.Global;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player
+namespace PlayerLogic
 {
     public class PlayerAttackHandler : MonoBehaviour
     {
@@ -21,6 +23,8 @@ namespace Player
         [SerializeField]
         private float _attackRate = 0.15f;
         private float _timeAtLastAttack = 0;
+
+        [SerializeField] private Vector3 _meleeOverlapExtents;
 
         private void Start()
         {
@@ -71,6 +75,42 @@ namespace Player
 
                 CreateMeleeEffect(flipX: false);
             }
+
+            // Check for enemies hit
+            Vector2 overlapCenter = AttackOrigin.position;
+
+            // Move center depending on player facing
+            overlapCenter += Player.instance.Movement.FacingLeft ? Vector2.left : Vector2.right;
+            var hitCols = Physics2D.OverlapBoxAll(overlapCenter, _meleeOverlapExtents, 0);
+
+            for(int i = 0;  i < hitCols.Length; i++)
+            {
+                var col = hitCols[i];
+
+                if (!col.CompareTag("Enemy"))
+                    continue;
+
+                var enemyData = col.GetComponent<EnemyData>();
+
+                if (enemyData == null)
+                    continue;
+
+                // TODO: Actually change the damage given depending on attack type
+                GameManager.Instance.EnemyHit(enemyData, 3);
+
+                // This is for Ossi to do
+                DisplayDamageNumber();
+            }
+        }
+
+        private void DisplayDamageNumber()
+        {
+            Debug.LogWarning("OSSI!!! MAKE THE DAMAGE NUMBERS SHOW!!");
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawCube(AttackOrigin.position, _meleeOverlapExtents);
         }
 
         void CreateMeleeEffect(bool flipX)
