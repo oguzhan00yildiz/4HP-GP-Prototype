@@ -1,8 +1,5 @@
 using Assets.Resources.Scripts.Enemies;
 using Assets.Resources.Scripts.Global;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 namespace PlayerLogic
@@ -10,7 +7,7 @@ namespace PlayerLogic
     public class PlayerAttackHandler : MonoBehaviour
     {
         [HideInInspector]
-        public Transform AttackOrigin;
+        public Transform attackOrigin;
 
         // To be used in tandem with movement script
         // so it doesn't flip the player around when trying to attack
@@ -26,26 +23,28 @@ namespace PlayerLogic
         private float _timeAtLastMelee = 0;
         private float _timeAtLastProjectile = 0;
 
-        [SerializeField] private Vector3 _meleeOverlapExtents;
+        [SerializeField] private Vector3 _meleeHitBox;
 
         //this is setting popupdamage effect settings
-        [SerializeField] private int damageToEnemy;
-        [SerializeField] private GameObject popUpTextPrefab;
-        [SerializeField] private float minX,maxX;
-
-        [SerializeField] private float fireRate;
+        [SerializeField] private int _meleeDamage;
+        [SerializeField] private float _projectileFireRate;
         [SerializeField] LayerMask enemyLayer;
-        [SerializeField] private GameObject bulletPrefab;
-        [SerializeField] float detectionRadius;
+        [SerializeField] private float detectionRadius;
+
+        public PlayerAttackHandler(float projectileFireRate, LayerMask enemyLayer)
+        {
+            this._projectileFireRate = projectileFireRate;
+            this.enemyLayer = enemyLayer;
+        }
 
         private void Awake()
         {
-            AttackOrigin = transform.Find("AttackOrigin");
+            attackOrigin = transform.Find("AttackOrigin");
         }
         private void Start()
         {
             
-            _attackAnimator = AttackOrigin.GetComponent<Animator>();
+            _attackAnimator = attackOrigin.GetComponent<Animator>();
             _meleeEffect = Resources.Load<GameObject>("Prefabs/Effects/Attacks/MeleeSwing");
         }
 
@@ -53,7 +52,7 @@ namespace PlayerLogic
         {
             if (Player.instance.Movement.AttackHeld)
             {
-                TryAttack();
+                TryMeleeAttack();
                 Attacking = true;
             }
             else
@@ -69,11 +68,11 @@ namespace PlayerLogic
         {
             Shoot();
         }
-        void TryAttack()
+        void TryMeleeAttack()
         {
             // Calculate whether we can attack now
-            float timeNow = Time.time;
-            float timeSinceLastAttack = timeNow - _timeAtLastMelee;
+            var timeNow = Time.time;
+            var timeSinceLastAttack = timeNow - _timeAtLastMelee;
 
             // If we attacked too short a duration ago, return (do not proceed)
             if (timeSinceLastAttack < _attackRate)
@@ -84,7 +83,7 @@ namespace PlayerLogic
 
             // Turn player in the direction he is attacking and set flag to true
             // (when mouse position x is less than the screen's width split in half, the mouse is on the left side)
-            if (Input.mousePosition.x < Screen.width / 2)
+            if (Input.mousePosition.x < (float)Screen.width / 2)
             {
                 Player.instance.Movement.SetFacing(left: true);
                 CreateMeleeEffect(flipX: true);
@@ -99,16 +98,14 @@ namespace PlayerLogic
             }
 
             // Check for enemies hit
-            Vector2 overlapCenter = AttackOrigin.position;
+            Vector2 overlapCenter = attackOrigin.position;
 
             // Move center depending on player facing
             overlapCenter += Player.instance.Movement.FacingLeft ? Vector2.left : Vector2.right;
-            var hitCols = Physics2D.OverlapBoxAll(overlapCenter, _meleeOverlapExtents, 0);
+            var hitCols = Physics2D.OverlapBoxAll(overlapCenter, _meleeHitBox, 0);
 
-            for(int i = 0;  i < hitCols.Length; i++)
+            foreach (var col in hitCols)
             {
-                var col = hitCols[i];
-
                 if (!col.CompareTag("Enemy"))
                     continue;
 
@@ -118,31 +115,19 @@ namespace PlayerLogic
                     continue;
 
                 // TODO: Actually change the damage given depending on attack type
-                GameManager.Instance.EnemyHit(enemyData, damageToEnemy);
-
-                // This is for Ossi to do
-                DisplayDamageNumber(col,damageToEnemy);
+                GameManager.Instance.EnemyHit(col.gameObject, _meleeDamage);
             }
-        }
-
-        private void DisplayDamageNumber(Collider2D collider,int damageAmount)
-        { 
-            float rnd =Random.Range(minX,maxX);
-            Vector3 newPos= new Vector3(rnd,0,0);
-            GameObject popUpObject= Instantiate(popUpTextPrefab,collider.transform.position+newPos,collider.transform.rotation);
-            popUpObject.transform.GetComponentInChildren<TextMeshPro>().text = damageAmount.ToString();
-            Destroy(popUpObject.gameObject,.5f);
         }
 
         private void OnDrawGizmos()
         {
-            Gizmos.DrawCube(AttackOrigin.position, _meleeOverlapExtents);
+            Gizmos.DrawCube(attackOrigin.position, _meleeHitBox);
         }
 
         void CreateMeleeEffect(bool flipX)
         {
-            GameObject fx = Instantiate(_meleeEffect, AttackOrigin.position, Quaternion.identity);
-            Vector3 scale = fx.transform.localScale;
+            var fx = Instantiate(_meleeEffect, attackOrigin.position, Quaternion.identity);
+            var scale = fx.transform.localScale;
             if (flipX)
             {
                 scale.x *= -1;
@@ -153,21 +138,21 @@ namespace PlayerLogic
        void Shoot()
         {
             //create a fire rate
-            float timeNow = Time.time;
-            float timeSinceLastAttack = timeNow - _timeAtLastProjectile;
+            var timeNow = Time.time;
+            var timeSinceLastAttack = timeNow - _timeAtLastProjectile;
 
             // If we attacked too short a duration ago, return (do not proceed)
-            if (timeSinceLastAttack > fireRate)
+            if (timeSinceLastAttack > _projectileFireRate)
             {
                 _timeAtLastProjectile = Time.time;
-                Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayer);
+                var enemies = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayer);
 
-                float closestEnemyDistance = Mathf.Infinity;
+                var closestEnemyDistance = Mathf.Infinity;
                 Transform target = null;
-                foreach (Collider2D enemy in enemies)
+                foreach (var enemy in enemies)
                 {
                     Vector2 bulletDirection = enemy.transform.position - transform.position;
-                    float bulletDistance = bulletDirection.magnitude;
+                    var bulletDistance = bulletDirection.magnitude;
                     if (bulletDistance < closestEnemyDistance)
                     {
                         closestEnemyDistance = bulletDistance;

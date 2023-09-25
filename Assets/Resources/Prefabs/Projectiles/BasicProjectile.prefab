@@ -9762,7 +9762,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 7
-  _damage: 7
+  _damage: 5
 --- !u!1 &6547707656983046762
 GameObject:
   m_ObjectHideFlags: 0

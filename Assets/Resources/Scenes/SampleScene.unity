@@ -391,6 +391,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99088c9168c38a549a1459eeb587c621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _popUpTextPrefab: {fileID: 6127838542357400889, guid: 55f8ee559d9764848b51b1c414830c37, type: 3}
+  _minX: 0.15
+  _maxX: 0.15
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -22835,18 +22838,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af62dd5fc3558004eb1c76f3fe78b34c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AttackOrigin: {fileID: 1109684988}
-  _attackRate: 0.15
-  _meleeOverlapExtents: {x: 1, y: 0.25, z: 1}
-  damageToEnemy: 5
-  popUpTextPrefab: {fileID: 6127838542357400889, guid: 55f8ee559d9764848b51b1c414830c37, type: 3}
-  minX: -0.3
-  maxX: 0.3
-  fireRate: 0.5
+  attackOrigin: {fileID: 0}
+  _attackRate: 0.5
+  _meleeHitBox: {x: 1, y: 1.5, z: 1}
+  _meleeDamage: 10
+  _projectileFireRate: 0.5
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
-  bulletPrefab: {fileID: 0}
   detectionRadius: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

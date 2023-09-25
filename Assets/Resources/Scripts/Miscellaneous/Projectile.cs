@@ -1,7 +1,6 @@
 using Assets.Resources.Scripts.Enemies;
 using Assets.Resources.Scripts.Global;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -190,7 +189,7 @@ public class Projectile : MonoBehaviour
         if(distance < 0.4f && _targetTransform != null)
         {
             EnemyData data = _targetTransform.GetComponent<EnemyData>();
-            GameManager.Instance.EnemyHit(data, _damage);
+            GameManager.Instance.EnemyHit(_targetTransform.gameObject, _damage);
         }
 
         // Run explosion particles
