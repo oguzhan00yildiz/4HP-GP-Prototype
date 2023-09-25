@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Resources.Scripts.Global;
 using UnityEngine;
-using PlayerLogic;
 
 namespace Assets.Resources.Scripts.Enemies
 {
     public class SpawnerManager : MonoBehaviour
     {
-        [HideInInspector] public int currentWave;
+        [HideInInspector] public int currentWave = 1;
 
         [SerializeField] private List<EnemyData> _enemies = new();
 
@@ -15,10 +15,43 @@ namespace Assets.Resources.Scripts.Enemies
         private Transform _player;
         private float _nextSpawnTime;
         private int _waveBudget;
+        private int _totalEnemySpawned;
+        public int TotalNumSpawned => _totalEnemySpawned;
 
         private const float SpawnRadius = 15;
         private const float EnemiesPerSecond = 2;
         private const int MaxEnemiesPerRound = 50;
+
+        #region Singleton
+        private static SpawnerManager _instance;
+        public static SpawnerManager Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+                _instance = FindObjectOfType<SpawnerManager>();
+
+                if (_instance != null) return _instance;
+                var obj = new GameObject("SpawnerManager");
+                _instance = obj.AddComponent<SpawnerManager>();
+
+                return _instance;
+            }
+        }
+        #endregion
+
+        private void OnEnable()
+        {
+            if (_instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+        }
 
         void Start()
         {
@@ -35,24 +68,18 @@ namespace Assets.Resources.Scripts.Enemies
 
             #endregion
 
-            // Generates the first wave
+            // Generates the first wave AND SET WAVE TO ONE
+            // WHY DO WE NEED TO SET THIS TO 1??? IT KEEPS GOING TO 3
+            // currentWave = 1;
             CalculateWaveBudget(); 
         }
 
         void Update()
         {
             // Checking if we have more enemies to spawn
-            if (Time.time >= _nextSpawnTime && _enemiesToSpawn.Count != 0) 
-            {
-                SpawnEnemy();
-                _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
-            }
-
-            // When enemies have been spawned AND have been killed, then we go to the next wave and start the cycle
-            if (_enemiesToSpawn.Count == 0 && FindObjectsOfType<EnemyMovement>().Length == 0)
-            {
-                StartNextWave();
-            }
+            if (!(Time.time >= _nextSpawnTime) || _enemiesToSpawn.Count == 0) return;
+            SpawnEnemy();
+            _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
         }
 
         // This method decides the "budget" for the wave
@@ -65,6 +92,9 @@ namespace Assets.Resources.Scripts.Enemies
         // Creates the list of enemies that then are going to be spawned according to current wave and budget
         private void GenerateEnemies()
         {
+            CanvasManager.Instance.ResetProgressBar();
+            _enemiesToSpawn.Clear();
+
             // LINQ expression to creates a list of all the unlocked enemies given the current wave
             var availableEnemies = _enemies.Where(enemy => enemy.unlockingWave <= currentWave && currentWave <= enemy.lastSpawningWave).ToList();
             
@@ -95,8 +125,8 @@ namespace Assets.Resources.Scripts.Enemies
                  availableEnemies.Remove(availableEnemies[randEnemyId]);
             }
 
-            _enemiesToSpawn.Clear();
-            _enemiesToSpawn = generatedEnemies;     
+            _enemiesToSpawn = generatedEnemies;
+            _totalEnemySpawned = generatedEnemies.Count;
         }
 
         // This method returns a random spawn point so for SpawnEnemy() to use
@@ -123,7 +153,7 @@ namespace Assets.Resources.Scripts.Enemies
         }
 
         // Restarts the spawning cycle
-        private void StartNextWave()
+        public void StartNextWave()
         {
             currentWave++;
             CalculateWaveBudget();

@@ -136,7 +136,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 3
-  _stoppingDistance: 2
   _rigidbody: {fileID: 0}
 --- !u!114 &4480335171376945700
 MonoBehaviour:
@@ -242,7 +241,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7319132743036782235
 MonoBehaviour:
   m_ObjectHideFlags: 0
