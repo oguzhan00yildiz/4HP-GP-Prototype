@@ -29,6 +29,7 @@ namespace PlayerLogic
 
         [SerializeField] private int damageToEnemy;
         [SerializeField] private GameObject popUpTextPrefab;
+        [SerializeField] private float minX,maxX;
 
         private void Awake()
         {
@@ -113,7 +114,9 @@ namespace PlayerLogic
 
         private void DisplayDamageNumber(Collider2D collider,int damageAmount)
         { 
-            GameObject popUpObject= Instantiate(popUpTextPrefab,collider.transform.position,collider.transform.rotation);
+            float rnd =Random.Range(minX,maxX);
+            Vector3 newPos= new Vector3(rnd,0,0);
+            GameObject popUpObject= Instantiate(popUpTextPrefab,collider.transform.position+newPos,collider.transform.rotation);
             popUpObject.transform.GetComponentInChildren<TextMeshPro>().text = damageAmount.ToString();
             Destroy(popUpObject.gameObject,.5f);
         }
