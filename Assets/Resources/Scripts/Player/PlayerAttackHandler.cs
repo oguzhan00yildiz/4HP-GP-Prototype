@@ -2,6 +2,7 @@ using Assets.Resources.Scripts.Enemies;
 using Assets.Resources.Scripts.Global;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace PlayerLogic
@@ -26,9 +27,17 @@ namespace PlayerLogic
 
         [SerializeField] private Vector3 _meleeOverlapExtents;
 
-        private void Start()
+        [SerializeField] private int damageToEnemy;
+        [SerializeField] private GameObject popUpTextPrefab;
+        [SerializeField] private float minX,maxX;
+
+        private void Awake()
         {
             AttackOrigin = transform.Find("AttackOrigin");
+        }
+        private void Start()
+        {
+            
             _attackAnimator = AttackOrigin.GetComponent<Animator>();
             _meleeEffect = Resources.Load<GameObject>("Prefabs/Effects/Attacks/MeleeSwing");
         }
@@ -96,16 +105,20 @@ namespace PlayerLogic
                     continue;
 
                 // TODO: Actually change the damage given depending on attack type
-                GameManager.Instance.EnemyHit(enemyData, 3);
+                GameManager.Instance.EnemyHit(enemyData, damageToEnemy);
 
                 // This is for Ossi to do
-                DisplayDamageNumber();
+                DisplayDamageNumber(col,damageToEnemy);
             }
         }
 
-        private void DisplayDamageNumber()
-        {
-            Debug.LogWarning("OSSI!!! MAKE THE DAMAGE NUMBERS SHOW!!");
+        private void DisplayDamageNumber(Collider2D collider,int damageAmount)
+        { 
+            float rnd =Random.Range(minX,maxX);
+            Vector3 newPos= new Vector3(rnd,0,0);
+            GameObject popUpObject= Instantiate(popUpTextPrefab,collider.transform.position+newPos,collider.transform.rotation);
+            popUpObject.transform.GetComponentInChildren<TextMeshPro>().text = damageAmount.ToString();
+            Destroy(popUpObject.gameObject,.5f);
         }
 
         private void OnDrawGizmos()
