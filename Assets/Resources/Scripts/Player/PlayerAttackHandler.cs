@@ -23,7 +23,8 @@ namespace PlayerLogic
         private static GameObject _meleeEffect;
         [SerializeField]
         private float _attackRate = 0.15f;
-        private float _timeAtLastAttack = 0;
+        private float _timeAtLastMelee = 0;
+        private float _timeAtLastProjectile = 0;
 
         [SerializeField] private Vector3 _meleeOverlapExtents;
 
@@ -72,14 +73,14 @@ namespace PlayerLogic
         {
             // Calculate whether we can attack now
             float timeNow = Time.time;
-            float timeSinceLastAttack = timeNow - _timeAtLastAttack;
+            float timeSinceLastAttack = timeNow - _timeAtLastMelee;
 
             // If we attacked too short a duration ago, return (do not proceed)
             if (timeSinceLastAttack < _attackRate)
                 return;
             
 
-            _timeAtLastAttack = Time.time;
+            _timeAtLastMelee = Time.time;
 
             // Turn player in the direction he is attacking and set flag to true
             // (when mouse position x is less than the screen's width split in half, the mouse is on the left side)
@@ -152,9 +153,13 @@ namespace PlayerLogic
        void Shoot()
         {
             //create a fire rate
-            if (Time.time > fireRate)
+            float timeNow = Time.time;
+            float timeSinceLastAttack = timeNow - _timeAtLastProjectile;
+
+            // If we attacked too short a duration ago, return (do not proceed)
+            if (timeSinceLastAttack > fireRate)
             {
-                fireRate = Time.time + fireRate;
+                _timeAtLastProjectile = Time.time;
                 Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayer);
 
                 float closestEnemyDistance = Mathf.Infinity;

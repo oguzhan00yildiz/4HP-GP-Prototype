@@ -22842,6 +22842,12 @@ MonoBehaviour:
   popUpTextPrefab: {fileID: 6127838542357400889, guid: 55f8ee559d9764848b51b1c414830c37, type: 3}
   minX: -0.3
   maxX: 0.3
+  fireRate: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  bulletPrefab: {fileID: 0}
+  detectionRadius: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

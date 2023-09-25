@@ -130,10 +130,11 @@ public class Projectile : MonoBehaviour
         Destroy(explosionParticles.gameObject);
     }
 
+    Vector2 lastKnownDirection = Vector2.zero;
     IEnumerator AnimateProjectileTowardsTransform()
     {
         float distance = Mathf.Infinity;
-        int maxLifetimeFrames = 15_000;
+        int maxLifetimeFrames = 5000;
         int lifeFrames = 0;
 
         // Find "end explosion" particles
@@ -142,21 +143,27 @@ public class Projectile : MonoBehaviour
         explosionParticles.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         // Set parent to null (unparent particles from projectile, remember to destroy)
         explosionParticles.transform.parent = null;
+        Vector2 direction = Vector2.zero;
 
         while (distance > 0.4f)
         {
-            if(_targetTransform == null)
+            if(_targetTransform != null)
             {
-                break;
+                _target = _targetTransform.position;
             }
-
-            _target = _targetTransform.position;
+            else
+            {
+                _target += lastKnownDirection.normalized;
+                direction = _target - _origin;
+                lastKnownDirection = direction.normalized;
+            }
 
             // Update distance
             distance = Vector2.Distance(transform.position, _target);
-
+            
             // Get direction from point A to point B
-            Vector2 direction = _target - _origin;
+            direction = _target - _origin;
+            lastKnownDirection = direction.normalized;
 
             // Normalize direction to a length of 1 so it doesn't affect flight speed
             direction = direction.normalized;
@@ -180,7 +187,7 @@ public class Projectile : MonoBehaviour
         // Just destroy the projectile object for now
         Destroy(gameObject);
         distance = Vector2.Distance(transform.position, _target);
-        if(distance < 0.4f)
+        if(distance < 0.4f && _targetTransform != null)
         {
             EnemyData data = _targetTransform.GetComponent<EnemyData>();
             GameManager.Instance.EnemyHit(data, _damage);
