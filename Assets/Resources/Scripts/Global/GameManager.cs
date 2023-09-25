@@ -1,5 +1,6 @@
 using System.Collections;
 using Assets.Resources.Scripts.Enemies;
+using TMPro;
 using UnityEngine;
 
 namespace Assets.Resources.Scripts.Global
@@ -9,6 +10,9 @@ namespace Assets.Resources.Scripts.Global
         private int _killedEnemies;
         private const float HealthBarTransitionDuration = .1f;
         private bool _playerReady;
+
+        [SerializeField] private GameObject _popUpTextPrefab;
+        [SerializeField] private float _minX, _maxX;
 
         #region Singleton
         private static GameManager _instance;
@@ -42,18 +46,20 @@ namespace Assets.Resources.Scripts.Global
         }
 
         // Deals damage to the enemy hit
-        public void EnemyHit(EnemyData enemyHit, int damage)
+        public void EnemyHit(GameObject enemyHit, int damage)
         {
-            var initialHealth = enemyHit.enemyHealth;
-            var remainingHealth = enemyHit.enemyHealth -= damage;
+            DisplayDamageNumber(enemyHit.transform.position, damage);
 
-            StartCoroutine(UpdateHealthBar(enemyHit, initialHealth, remainingHealth));
+            var initialHealth = enemyHit.GetComponent<EnemyData>().enemyHealth;
+            var remainingHealth = enemyHit.GetComponent<EnemyData>().enemyHealth -= damage;
+
+            StartCoroutine(UpdateHealthBar(enemyHit.GetComponent<EnemyData>(), initialHealth, remainingHealth));
 
             if (remainingHealth <= 0) { EnemyKilled(enemyHit); }
         }
 
         // Kills the enemy
-        public void EnemyKilled(EnemyData enemyKilled)
+        public void EnemyKilled(GameObject enemyKilled)
         {
             Destroy(enemyKilled.gameObject);
             _killedEnemies++;
@@ -102,6 +108,14 @@ namespace Assets.Resources.Scripts.Global
             }
 
             enemyHit.enemyHealthBar.value = targetHealthRatio;
+        }
+        private void DisplayDamageNumber(Vector2 origin, int damageAmount)
+        {
+            float rnd = Random.Range(_minX, _maxX);
+            var newPos = new Vector3(rnd, 0, 0);
+            var popUpObject = Instantiate(_popUpTextPrefab, origin + (Vector2)newPos, Quaternion.identity);
+            popUpObject.transform.GetComponentInChildren<TextMeshPro>().text = damageAmount.ToString();
+            Destroy(popUpObject.gameObject, .5f);
         }
 
         public void ClearKilledEnemyCounter()
