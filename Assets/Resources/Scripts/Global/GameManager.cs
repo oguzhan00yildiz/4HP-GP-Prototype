@@ -6,6 +6,10 @@ namespace Assets.Resources.Scripts.Global
 {
     public class GameManager : MonoBehaviour
     {
+        private int _killedEnemies;
+        private const float HealthBarTransitionDuration = .1f;
+        private bool _playerReady;
+
         #region Singleton
         private static GameManager _instance;
         public static GameManager Instance
@@ -24,19 +28,16 @@ namespace Assets.Resources.Scripts.Global
         }
         #endregion
 
-        public int killedEnemies;
-        private const float HealthBarTransitionDuration = .1f;
-
-        private void Awake()
+        private void OnEnable()
         {
-            if (_instance == null)
+            if (_instance != null && Instance != this)
             {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
+                Destroy(gameObject);
             }
             else
             {
-                Destroy(gameObject);
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
             }
         }
 
@@ -55,7 +56,37 @@ namespace Assets.Resources.Scripts.Global
         public void EnemyKilled(EnemyData enemyKilled)
         {
             Destroy(enemyKilled.gameObject);
-            killedEnemies++;
+            _killedEnemies++;
+            var progressPercentage = (float)_killedEnemies / (SpawnerManager.Instance.TotalNumSpawned != 0
+                ? SpawnerManager.Instance.TotalNumSpawned
+                : 1);
+            CanvasManager.Instance.UpdateProgress(progressPercentage);
+
+            if (_killedEnemies < SpawnerManager.Instance.TotalNumSpawned)
+            {
+                return;
+            }
+
+            ClearKilledEnemyCounter();
+            CanvasManager.Instance.OnWaveCompleted();
+            // Start waiting for player to be ready to start next wave
+            StartCoroutine(PlayerContinueWaiter());
+        }
+
+        private IEnumerator PlayerContinueWaiter()
+        {
+            while (!_playerReady)
+            {
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            SpawnerManager.Instance.StartNextWave();
+            _playerReady = false;
+        }
+
+        public void PlayerSetReady()
+        {
+            _playerReady = true;
         }
 
         // Updates the health bar to the new value with a smooth animation
@@ -71,6 +102,11 @@ namespace Assets.Resources.Scripts.Global
             }
 
             enemyHit.enemyHealthBar.value = targetHealthRatio;
+        }
+
+        public void ClearKilledEnemyCounter()
+        {
+            _killedEnemies = 0;
         }
     }
 }

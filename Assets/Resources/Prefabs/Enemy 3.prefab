@@ -211,7 +211,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 4
-  _stoppingDistance: 2
   _rigidbody: {fileID: 0}
 --- !u!114 &8680879829084787831
 MonoBehaviour:

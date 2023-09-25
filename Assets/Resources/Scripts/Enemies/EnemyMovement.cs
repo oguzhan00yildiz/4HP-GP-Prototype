@@ -4,7 +4,7 @@ using UnityEngine;
 public class EnemyMovement : MonoBehaviour
 {
     [SerializeField] private float _speed;
-    [SerializeField] private float _stoppingDistance = 0.0f;
+    //[SerializeField] private float _stoppingDistance = 0.0f;
     [SerializeField] private Rigidbody2D _rigidbody;
     
 
@@ -38,11 +38,8 @@ public class EnemyMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
-        
-            Vector3 moveAmount = transform.position + _targetDirection.normalized * _speed * Time.fixedDeltaTime;
-            _rigidbody.MovePosition(moveAmount);
-        
+        Vector3 moveAmount = transform.position + _targetDirection.normalized * _speed * Time.fixedDeltaTime;
+        _rigidbody.MovePosition(moveAmount);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
