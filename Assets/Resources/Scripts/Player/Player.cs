@@ -27,7 +27,7 @@ namespace PlayerLogic
         public void TakeDamage(int amount)
         {
             // Shake camera
-            CameraShake shaker = Player.instance.Camera.GetComponent<CameraShake>();
+            CameraShake shaker = instance.Camera.GetComponent<CameraShake>();
             shaker.Shake(0.25f, 0.1f);
 
             // Find damage overlay effect
