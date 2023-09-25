@@ -55,6 +55,22 @@ public class ProjectileManager : MonoBehaviour
         proj.InitializeProjectile(origin, target, color);
     }
 
+    public static void CreateProjectile(Vector2 origin, Transform target, Color color)
+    {
+        GameObject projectileObj = InstantiateProjectile();
+        projectileObj.transform.position = origin;
+
+        Projectile proj = projectileObj.GetComponent<Projectile>();
+
+        if (proj == null)
+        {
+            Debug.LogError($"Projectile {projectileObj.name} doesn't have a Projectile component!", projectileObj);
+            return;
+        }
+
+        proj.InitializeProjectileWithTransform(origin, target, color);
+    }
+
     static GameObject InstantiateProjectile()
     {
         if(_prefabCache == null )

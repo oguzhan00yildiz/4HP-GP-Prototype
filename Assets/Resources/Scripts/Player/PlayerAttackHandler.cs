@@ -27,9 +27,15 @@ namespace PlayerLogic
 
         [SerializeField] private Vector3 _meleeOverlapExtents;
 
+        //this is setting popupdamage effect settings
         [SerializeField] private int damageToEnemy;
         [SerializeField] private GameObject popUpTextPrefab;
         [SerializeField] private float minX,maxX;
+
+        [SerializeField] private float fireRate;
+        [SerializeField] LayerMask enemyLayer;
+        [SerializeField] private GameObject bulletPrefab;
+        [SerializeField] float detectionRadius;
 
         private void Awake()
         {
@@ -57,6 +63,11 @@ namespace PlayerLogic
                 Player.instance.TakeDamage(0);
             }
         }
+
+        private void FixedUpdate()
+        {
+            Shoot();
+        }
         void TryAttack()
         {
             // Calculate whether we can attack now
@@ -66,6 +77,7 @@ namespace PlayerLogic
             // If we attacked too short a duration ago, return (do not proceed)
             if (timeSinceLastAttack < _attackRate)
                 return;
+            
 
             _timeAtLastAttack = Time.time;
 
@@ -136,5 +148,46 @@ namespace PlayerLogic
                 fx.transform.localScale = scale;
             }
         }
+
+       void Shoot()
+        {
+            //create a fire rate
+            if (Time.time > fireRate)
+            {
+                fireRate = Time.time + fireRate;
+                Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayer);
+
+                float closestEnemyDistance = Mathf.Infinity;
+                Transform target = null;
+                foreach (Collider2D enemy in enemies)
+                {
+                    Vector2 bulletDirection = enemy.transform.position - transform.position;
+                    float bulletDistance = bulletDirection.magnitude;
+                    if (bulletDistance < closestEnemyDistance)
+                    {
+                        closestEnemyDistance = bulletDistance;
+                        target = enemy.transform;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                if (target == null)
+                {
+                    return;
+                }
+
+
+                ProjectileManager.CreateProjectile(transform.position, target, Color.cyan);
+            }
+        }
+
+           
+
+
+
+
+
     }
 }
