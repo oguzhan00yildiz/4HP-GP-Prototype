@@ -11,7 +11,6 @@ namespace Assets.Resources.Scripts.Global
         [SerializeField] private Slider _waveProgressSlider;
         [SerializeField] private GameObject _upgradeScreen;
         private float progressBarTransitionDuration = 0.2f;
-        private UpgradeManager upgradeManager;
 
         #region Singleton
         private static CanvasManager _instance;
@@ -46,16 +45,6 @@ namespace Assets.Resources.Scripts.Global
 
         private void Awake()
         {
-            if (_upgradeScreen)
-            {
-                _upgradeScreen.SetActive(false);
-            }
-
-            upgradeManager = FindObjectOfType<UpgradeManager>();
-            if (upgradeManager == null)
-            {
-                Debug.LogError("CanvasManager: UpgradeManager not found!");
-            }
         }
 
         public void UpdateProgress(float newProgress)
@@ -87,22 +76,6 @@ namespace Assets.Resources.Scripts.Global
         {
             _upgradeScreen.SetActive(true);
            
-        }
-
-        public void Ability1()
-        {
-            upgradeManager.AbilityShoot();
-            _upgradeScreen.SetActive(false);    
-        }
-
-        public void Ability2()
-        {
-            _upgradeScreen.SetActive(false);
-        }
-
-        public void Ability3()
-        {
-            _upgradeScreen.SetActive(false);
         }
 
     }
