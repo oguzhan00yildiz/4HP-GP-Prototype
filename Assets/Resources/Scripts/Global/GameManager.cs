@@ -90,6 +90,7 @@ namespace Assets.Resources.Scripts.Global
             _playerReady = false;
         }
 
+        // Call this to set the internal flag to true to start the next wave
         public void PlayerSetReady()
         {
             _playerReady = true;
