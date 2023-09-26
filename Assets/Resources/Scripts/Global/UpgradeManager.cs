@@ -12,7 +12,7 @@ public class UpgradeManager : MonoBehaviour
 
     private UpgradeType selectedUpgrade = UpgradeType.None;
 
-    private enum UpgradeType
+    private enum UpgradeType //here we made ability enum system
     {
         None,
         ShootingAbility,
@@ -30,7 +30,7 @@ public class UpgradeManager : MonoBehaviour
         for (int i = 0; i < upgradeButtons.Length; i++)
         {
             int buttonIndex = i; 
-            upgradeButtons[i].onClick.AddListener(() => SelectUpgrade(buttonIndex));
+            upgradeButtons[i].onClick.AddListener(() => SelectUpgrade(buttonIndex)); //here we made buttons automated
         }
 
         // When a wave is completed, randomly select new upgrades and assign them to buttons.
@@ -39,7 +39,7 @@ public class UpgradeManager : MonoBehaviour
 
     private void Update()
     {
-        if (selectedUpgrade==UpgradeType.ShootingAbility)
+        if (selectedUpgrade==UpgradeType.ShootingAbility) //here we reached our shooting ability and activated it if button clicked
         {
             PlayerAttackHandler.instance.Shoot();
         }
@@ -53,7 +53,7 @@ public class UpgradeManager : MonoBehaviour
         
         for (int i = 0; i < upgradeButtons.Length; i++)
         {
-            TextMeshProUGUI buttonText = upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI buttonText = upgradeButtons[i].GetComponentInChildren<TextMeshProUGUI>();  //here we randomized buttons
             if (buttonText != null)
             {
                 buttonText.text = randomUpgrades[i].ToString();
@@ -73,7 +73,7 @@ public class UpgradeManager : MonoBehaviour
 
     public void SelectUpgrade(int buttonIndex)
     {
-        string upgradeName = upgradeButtons[buttonIndex].GetComponentInChildren<TextMeshProUGUI>().text;
+        string upgradeName = upgradeButtons[buttonIndex].GetComponentInChildren<TextMeshProUGUI>().text; //here we updated our button texts and selected our ability
         selectedUpgrade = (UpgradeType)System.Enum.Parse(typeof(UpgradeType), upgradeName);
         upgradePanel.SetActive(false);
         WaveCompleted();
@@ -83,7 +83,7 @@ public class UpgradeManager : MonoBehaviour
     {
         // Create a list containing all upgrades.
         List<UpgradeType> allUpgrades = new List<UpgradeType>();
-        foreach (UpgradeType upgrade in System.Enum.GetValues(typeof(UpgradeType)))
+        foreach (UpgradeType upgrade in System.Enum.GetValues(typeof(UpgradeType))) //here randomly select a specified number of upgrades and return them as an array while ensuring that each upgrade is unique.
         {
             if (upgrade != UpgradeType.None)
             {
