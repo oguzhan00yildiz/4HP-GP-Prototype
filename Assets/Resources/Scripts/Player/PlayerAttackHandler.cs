@@ -31,7 +31,6 @@ namespace PlayerLogic
         [SerializeField] LayerMask enemyLayer;
         [SerializeField] private float detectionRadius;
         [HideInInspector]
-        public bool AbilityShoot;
         public static PlayerAttackHandler instance;
 
         public PlayerAttackHandler(float projectileFireRate, LayerMask enemyLayer)
@@ -70,10 +69,7 @@ namespace PlayerLogic
 
         private void FixedUpdate()
         {
-            if (AbilityShoot)
-            {
-                Shoot();
-            }
+           
         }
         void TryMeleeAttack()
         {
@@ -142,7 +138,7 @@ namespace PlayerLogic
             }
         }
 
-       void Shoot()
+       public void Shoot()
         {
             //create a fire rate
             var timeNow = Time.time;
