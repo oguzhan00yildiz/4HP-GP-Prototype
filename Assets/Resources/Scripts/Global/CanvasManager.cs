@@ -1,3 +1,4 @@
+using PlayerLogic;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -42,6 +43,14 @@ namespace Assets.Resources.Scripts.Global
             }
         }
 
+        private void Awake()
+        {
+            if (_upgradeScreen)
+            {
+                _upgradeScreen.SetActive(false);
+            }
+        }
+
         public void UpdateProgress(float newProgress)
         {
             float currentProgress = _waveProgressSlider.value;
@@ -70,6 +79,24 @@ namespace Assets.Resources.Scripts.Global
         public void OnWaveCompleted()
         {
             _upgradeScreen.SetActive(true);
+           
         }
+
+        public void Ability1()
+        {
+            PlayerAttackHandler.instance.AbilityShoot = true;
+            _upgradeScreen.SetActive(false);    
+        }
+
+        public void Ability2()
+        {
+            _upgradeScreen.SetActive(false);
+        }
+
+        public void Ability3()
+        {
+            _upgradeScreen.SetActive(false);
+        }
+
     }
 }
