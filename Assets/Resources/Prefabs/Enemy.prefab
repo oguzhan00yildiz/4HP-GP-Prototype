@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7227108605469100798}
   - component: {fileID: 6543722112716369161}
   - component: {fileID: 6873994310299632655}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 754445756894717467}
   - component: {fileID: 8464932696041934991}
   - component: {fileID: 6032717443744514719}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: -4763829325891062933}
   - component: {fileID: 3191575645960664552}
   - component: {fileID: 2448914194805704164}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -313,6 +313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 2
+  _rigidbody: {fileID: 0}
 --- !u!114 &2448914194805704164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -330,6 +331,7 @@ MonoBehaviour:
   enemyCost: 1
   unlockingWave: 1
   lastSpawningWave: 2
+  maxPercentageInWave: 100
   enemyPrefab: {fileID: 2980317213719450687}
   enemyHealthBar: {fileID: 3956444284323163398}
 --- !u!1 &3084814958264213526
@@ -342,7 +344,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1009855196530015919}
   - component: {fileID: 3956444284323163398}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HP Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -415,9 +417,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 12
+  m_MaxValue: 1
   m_WholeNumbers: 1
-  m_Value: 12
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -430,7 +432,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2536495870020812819}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -468,7 +470,7 @@ GameObject:
   - component: {fileID: 5316573616387611499}
   - component: {fileID: 2727465517288869971}
   - component: {fileID: 7241386010351942098}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}

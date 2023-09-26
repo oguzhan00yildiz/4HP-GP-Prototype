@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -4763829325891062933}
   - component: {fileID: 3191575645960664552}
   - component: {fileID: 4480335171376945700}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy 2
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 3
+  _rigidbody: {fileID: 0}
 --- !u!114 &4480335171376945700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +154,7 @@ MonoBehaviour:
   enemyCost: 2
   unlockingWave: 2
   lastSpawningWave: 4
+  maxPercentageInWave: 50
   enemyPrefab: {fileID: 2980317213719450687}
   enemyHealthBar: {fileID: 1666303419394992019}
 --- !u!1 &3162034185332459208
@@ -167,7 +169,7 @@ GameObject:
   - component: {fileID: 2012066643446356480}
   - component: {fileID: 3990617658953870296}
   - component: {fileID: 7319132743036782235}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +241,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7319132743036782235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,7 +269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2137125490600284927}
   - component: {fileID: 1666303419394992019}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HP Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,7 +359,7 @@ GameObject:
   - component: {fileID: 7279250056750843810}
   - component: {fileID: 7252992195708799351}
   - component: {fileID: 1915449451255534215}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -432,7 +434,7 @@ GameObject:
   - component: {fileID: 6846233085989397236}
   - component: {fileID: 1875906767260276352}
   - component: {fileID: 4909210040818001399}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -505,7 +507,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6397687240551555861}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}

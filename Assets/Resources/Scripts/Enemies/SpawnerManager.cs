@@ -1,24 +1,57 @@
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Resources.Scripts.Global;
 using UnityEngine;
-using PlayerLogic;
 
 namespace Assets.Resources.Scripts.Enemies
 {
     public class SpawnerManager : MonoBehaviour
     {
-        [HideInInspector] public int currentWave;
+        [HideInInspector] public int currentWave = 1;
 
         [SerializeField] private List<EnemyData> _enemies = new();
 
         private List<GameObject> _enemiesToSpawn = new();
         private Transform _player;
         private float _nextSpawnTime;
-        private int _waveValue;
+        private int _waveBudget;
+        private int _totalEnemySpawned;
+        public int TotalNumSpawned => _totalEnemySpawned;
 
         private const float SpawnRadius = 15;
         private const float EnemiesPerSecond = 2;
         private const int MaxEnemiesPerRound = 50;
+
+        #region Singleton
+        private static SpawnerManager _instance;
+        public static SpawnerManager Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+                _instance = FindObjectOfType<SpawnerManager>();
+
+                if (_instance != null) return _instance;
+                var obj = new GameObject("SpawnerManager");
+                _instance = obj.AddComponent<SpawnerManager>();
+
+                return _instance;
+            }
+        }
+        #endregion
+
+        private void OnEnable()
+        {
+            if (_instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+        }
 
         void Start()
         {
@@ -35,40 +68,38 @@ namespace Assets.Resources.Scripts.Enemies
 
             #endregion
 
-            // Generates the first wave
+            // Generates the first wave AND SET WAVE TO ONE
+            // WHY DO WE NEED TO SET THIS TO 1??? IT KEEPS GOING TO 3
+            // currentWave = 1;
             CalculateWaveBudget(); 
         }
 
         void Update()
         {
             // Checking if we have more enemies to spawn
-            if (Time.time >= _nextSpawnTime && _enemiesToSpawn.Count != 0) 
-            {
-                SpawnEnemy();
-                _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
-            }
-
-            // When enemies have been spawned AND have been killed, then we go to the next wave and start the cycle
-            if (_enemiesToSpawn.Count == 0 && FindObjectsOfType<EnemyMovement>().Length == 0)
-            {
-                StartNextWave();
-            }
+            if (!(Time.time >= _nextSpawnTime) || _enemiesToSpawn.Count == 0) return;
+            SpawnEnemy();
+            _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
         }
 
         // This method decides the "budget" for the wave
         private void CalculateWaveBudget() 
         {
-            _waveValue = currentWave * 10;
+            _waveBudget = currentWave * 10;
             GenerateEnemies();
         }
 
         // Creates the list of enemies that then are going to be spawned according to current wave and budget
         private void GenerateEnemies()
         {
-            // Creates a list of all the unlocked enemies given the current wave
+            CanvasManager.Instance.ResetProgressBar();
+            _enemiesToSpawn.Clear();
+
+            // LINQ expression to creates a list of all the unlocked enemies given the current wave
             var availableEnemies = _enemies.Where(enemy => enemy.unlockingWave <= currentWave && currentWave <= enemy.lastSpawningWave).ToList();
             
             List<GameObject> generatedEnemies = new();
+            var remainingBudget = _waveBudget;
 
             // Chooses enemies at random from the available ones, until there are no more enemies available or enemies cap reached
             while (availableEnemies.Count != 0 && _enemiesToSpawn.Count < MaxEnemiesPerRound)
@@ -76,17 +107,26 @@ namespace Assets.Resources.Scripts.Enemies
                 var randEnemyId = Random.Range(0, availableEnemies.Count);
                 var randEnemyCost = availableEnemies[randEnemyId].enemyCost;
 
-                if (_waveValue - randEnemyCost > 0)
+                if (remainingBudget - randEnemyCost > 0)
                 {
-                    generatedEnemies.Add(availableEnemies[randEnemyId].enemyPrefab);
-                    _waveValue -= randEnemyCost;
+                    // Finds the number of the specific enemy that have already been added to the list and calculates the percentage compared to the whole budget for the wave
+                    var specificEnemyPercentage = ((float)generatedEnemies.FindAll(obj => availableEnemies[randEnemyId].enemyPrefab).Count) / _waveBudget * 100;
+
+                    // Check if there are already too many of that enemy in the wave, if not, it adds it to the list, if yes, it deletes it from the available enemies
+                    if (specificEnemyPercentage < availableEnemies[randEnemyId].maxPercentageInWave)
+                    {
+                        generatedEnemies.Add(availableEnemies[randEnemyId].enemyPrefab);
+                        remainingBudget -= randEnemyCost;
+                    }
+                    else
+                        availableEnemies.Remove(availableEnemies[randEnemyId]);
                 }
                 else
                  availableEnemies.Remove(availableEnemies[randEnemyId]);
             }
 
-            _enemiesToSpawn.Clear();
             _enemiesToSpawn = generatedEnemies;
+            _totalEnemySpawned = generatedEnemies.Count;
         }
 
         // This method returns a random spawn point so for SpawnEnemy() to use
@@ -113,7 +153,7 @@ namespace Assets.Resources.Scripts.Enemies
         }
 
         // Restarts the spawning cycle
-        private void StartNextWave()
+        public void StartNextWave()
         {
             currentWave++;
             CalculateWaveBudget();

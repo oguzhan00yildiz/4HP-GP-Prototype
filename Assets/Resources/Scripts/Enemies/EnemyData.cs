@@ -14,6 +14,7 @@ namespace Assets.Resources.Scripts.Enemies
         public int enemyCost;
         public int unlockingWave;
         public int lastSpawningWave;
+        public float maxPercentageInWave;
         [Space(10)]
 
 
