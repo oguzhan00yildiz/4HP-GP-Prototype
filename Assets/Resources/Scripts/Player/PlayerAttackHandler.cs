@@ -30,6 +30,7 @@ namespace PlayerLogic
         [SerializeField] private float _projectileFireRate;
         [SerializeField] LayerMask enemyLayer;
         [SerializeField] private float detectionRadius;
+        [HideInInspector]
         public bool AbilityShoot;
         public static PlayerAttackHandler instance;
 
