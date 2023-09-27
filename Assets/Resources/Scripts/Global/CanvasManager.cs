@@ -1,3 +1,4 @@
+using PlayerLogic;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -42,6 +43,10 @@ namespace Assets.Resources.Scripts.Global
             }
         }
 
+        private void Awake()
+        {
+        }
+
         public void UpdateProgress(float newProgress)
         {
             float currentProgress = _waveProgressSlider.value;
@@ -70,6 +75,8 @@ namespace Assets.Resources.Scripts.Global
         public void OnWaveCompleted()
         {
             _upgradeScreen.SetActive(true);
+           
         }
+
     }
 }

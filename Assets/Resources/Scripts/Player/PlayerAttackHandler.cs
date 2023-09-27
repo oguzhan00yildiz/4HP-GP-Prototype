@@ -30,6 +30,8 @@ namespace PlayerLogic
         [SerializeField] private float _projectileFireRate;
         [SerializeField] LayerMask enemyLayer;
         [SerializeField] private float detectionRadius;
+        [HideInInspector]
+        public static PlayerAttackHandler instance;
 
         public PlayerAttackHandler(float projectileFireRate, LayerMask enemyLayer)
         {
@@ -40,6 +42,7 @@ namespace PlayerLogic
         private void Awake()
         {
             attackOrigin = transform.Find("AttackOrigin");
+            instance = this;
         }
         private void Start()
         {
@@ -66,7 +69,7 @@ namespace PlayerLogic
 
         private void FixedUpdate()
         {
-            Shoot();
+           
         }
         void TryMeleeAttack()
         {
@@ -135,7 +138,7 @@ namespace PlayerLogic
             }
         }
 
-       void Shoot()
+       public void Shoot()
         {
             //create a fire rate
             var timeNow = Time.time;
