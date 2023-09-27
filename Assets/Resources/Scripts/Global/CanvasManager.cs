@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Resources.Scripts.Global
+namespace Global
 {
     public class CanvasManager : MonoBehaviour
     {
@@ -43,10 +43,6 @@ namespace Assets.Resources.Scripts.Global
             }
         }
 
-        private void Awake()
-        {
-        }
-
         public void UpdateProgress(float newProgress)
         {
             float currentProgress = _waveProgressSlider.value;
@@ -74,8 +70,7 @@ namespace Assets.Resources.Scripts.Global
 
         public void OnWaveCompleted()
         {
-            _upgradeScreen.SetActive(true);
-           
+            UpgradeManager.instance.ShowUpgradePanel();
         }
 
     }

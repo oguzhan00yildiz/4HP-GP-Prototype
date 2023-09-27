@@ -1,9 +1,9 @@
 using System.Collections;
-using Assets.Resources.Scripts.Enemies;
 using TMPro;
 using UnityEngine;
+using Enemies;
 
-namespace Assets.Resources.Scripts.Global
+namespace Global
 {
     public class GameManager : MonoBehaviour
     {

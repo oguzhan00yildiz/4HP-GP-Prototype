@@ -1,5 +1,5 @@
-using Assets.Resources.Scripts.Enemies;
-using Assets.Resources.Scripts.Global;
+using Enemies;
+using Global;
 using UnityEngine;
 
 namespace PlayerLogic

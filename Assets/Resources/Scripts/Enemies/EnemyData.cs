@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Resources.Scripts.Enemies
+namespace Enemies
 {
     public class EnemyData : MonoBehaviour
     {
