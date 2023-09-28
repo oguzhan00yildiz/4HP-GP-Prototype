@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Resources.Scripts.Global;
 using UnityEngine;
 
-namespace Assets.Resources.Scripts.Enemies
+namespace Enemies
 {
     public class SpawnerManager : MonoBehaviour
     {
@@ -92,7 +91,7 @@ namespace Assets.Resources.Scripts.Enemies
         // Creates the list of enemies that then are going to be spawned according to current wave and budget
         private void GenerateEnemies()
         {
-            CanvasManager.Instance.ResetProgressBar();
+            Global.CanvasManager.Instance.ResetProgressBar();
             _enemiesToSpawn.Clear();
 
             // LINQ expression to creates a list of all the unlocked enemies given the current wave

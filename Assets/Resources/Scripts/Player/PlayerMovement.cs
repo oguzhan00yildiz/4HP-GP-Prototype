@@ -30,7 +30,6 @@ namespace PlayerLogic
 
             _model = GameObject.FindWithTag("PlayerModel").transform;
 
-
             _modelRenderer = _model.GetComponentInChildren<SpriteRenderer>();
 
             _playerAnim = _model.GetComponentInChildren<Animator>();
@@ -77,7 +76,7 @@ namespace PlayerLogic
                 || (!FacingLeft && _nextMovement.x < 0);
 
             // Reverse animation (multiply animation speed by -1) if backtracking
-            if(backTracking)
+            if (backTracking)
             {
                 _playerAnim.SetFloat("MoveSpeed", -1);
             }

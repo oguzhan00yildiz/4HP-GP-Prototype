@@ -1,9 +1,9 @@
 using System.Collections;
-using Assets.Resources.Scripts.Enemies;
 using TMPro;
 using UnityEngine;
+using Enemies;
 
-namespace Assets.Resources.Scripts.Global
+namespace Global
 {
     public class GameManager : MonoBehaviour
     {
@@ -90,6 +90,7 @@ namespace Assets.Resources.Scripts.Global
             _playerReady = false;
         }
 
+        // Call this to set the internal flag to true to start the next wave
         public void PlayerSetReady()
         {
             _playerReady = true;

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0470f493bd139f9449de4cb5ce223f97, type: 3}
+  m_Name: Power_Of_Ossi
+  m_EditorClassIdentifier: 
+  UpgradeIcon: {fileID: -653619307, guid: e7538014b978b544aa3b7d19344fe7f7, type: 3}
+  UpgradeName: Power of Ossi
+  AffectAttackSpeed: 1
+  AttackSpeedFactor: 1.15
+  AffectDamage: 1
+  AttackDamageFactor: 0.95
+  AffectMoveSpeed: 0
+  MoveSpeedFactor: 3
+  MinimumWave: 1
+  FlavorText: '"The power of the great King Ossi courses through your veins."'

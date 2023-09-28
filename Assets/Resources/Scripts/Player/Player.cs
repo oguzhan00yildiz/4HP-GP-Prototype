@@ -6,6 +6,11 @@ namespace PlayerLogic
 {
     public class Player : MonoBehaviour
     {
+        public enum PlayerCharacter
+        {
+            Tank,
+            Archer
+        }
         public static Player instance { get; private set; }
         public PlayerMovement Movement { get; private set; }
         public PlayerAttackHandler AttackHandler { get; private set; }
@@ -27,12 +32,12 @@ namespace PlayerLogic
         public void TakeDamage(int amount)
         {
             // Shake camera
-            CameraShake shaker = Player.instance.Camera.GetComponent<CameraShake>();
+            CameraShake shaker = instance.Camera.GetComponent<CameraShake>();
             shaker.Shake(0.25f, 0.1f);
 
             // Find damage overlay effect
             DamageScreenEffect dmgFx =
-                Canvas.transform.Find("GameView/DamageOverlay")
+                Canvas.transform.Find("DamageOverlay")
                 .GetComponent<DamageScreenEffect>();
 
             // Show flash if not null
@@ -43,6 +48,11 @@ namespace PlayerLogic
         void Start()
         {
             Initialize();
+        }
+
+        public void AddUpgrade(SkillUpgrade upgrade)
+        {
+            Debug.Log("Added upgrade to player");
         }
 
         void Initialize()
