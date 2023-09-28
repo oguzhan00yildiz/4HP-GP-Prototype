@@ -131,7 +131,9 @@ namespace PlayerLogic
             // TODO: Add more upgrades, yes
             // TODO: Actually change the damage given depending on upgrade stats
 
-            Debug.Log($"Player now does {_meleeDamage * upgrade.AttackDamageFactor} dmg instead of {_meleeDamage}");
+            _meleeDamage *= upgrade.AttackDamageMultiplier;
+
+            //Debug.Log($"Player now does {_meleeDamage * upgrade.AttackDamageMultiplier} dmg instead of {_meleeDamage}");
         }
 
         private void OnDrawGizmos()
