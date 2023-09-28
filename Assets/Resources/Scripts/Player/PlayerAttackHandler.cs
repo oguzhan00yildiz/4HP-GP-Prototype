@@ -26,7 +26,7 @@ namespace PlayerLogic
         [SerializeField] private Vector3 _meleeHitBox;
 
         //this is setting popupdamage effect settings
-        [SerializeField] private int _meleeDamage;
+        [SerializeField] private float _meleeDamage;
         [SerializeField] private float _projectileFireRate;
         [SerializeField] LayerMask enemyLayer;
         [SerializeField] private float detectionRadius;
@@ -81,7 +81,6 @@ namespace PlayerLogic
             if (timeSinceLastAttack < _attackRate)
                 return;
             
-
             _timeAtLastMelee = Time.time;
 
             // Turn player in the direction he is attacking and set flag to true
@@ -118,8 +117,21 @@ namespace PlayerLogic
                     continue;
 
                 // TODO: Actually change the damage given depending on attack type
-                GameManager.Instance.EnemyHit(col.gameObject, _meleeDamage);
+                GameManager.Instance.EnemyHit(col.gameObject, Mathf.RoundToInt(_meleeDamage));
             }
+        }
+
+        // Actually receive the upgrade and update the player's stats
+        // according to the upgrade
+        public void ReceiveUpgrade(SkillUpgrade upgrade)
+        {
+            if (upgrade == null)
+                return;
+
+            // TODO: Add more upgrades, yes
+            // TODO: Actually change the damage given depending on upgrade stats
+
+            Debug.Log($"Player now does {_meleeDamage * upgrade.AttackDamageFactor} dmg instead of {_meleeDamage}");
         }
 
         private void OnDrawGizmos()

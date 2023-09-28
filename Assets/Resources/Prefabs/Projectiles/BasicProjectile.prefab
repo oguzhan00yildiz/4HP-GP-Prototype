@@ -9724,6 +9724,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3160731039052754716}
   - component: {fileID: 8311747860674356404}
+  - component: {fileID: 5960228781954909557}
   m_Layer: 0
   m_Name: BasicProjectile
   m_TagString: Untagged
@@ -9763,6 +9764,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 7
   _damage: 5
+--- !u!58 &5960228781954909557
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3199878810659800275}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.35
 --- !u!1 &6547707656983046762
 GameObject:
   m_ObjectHideFlags: 0
@@ -9774,7 +9810,7 @@ GameObject:
   - component: {fileID: 8809652960891082058}
   - component: {fileID: 7754927442610944328}
   m_Layer: 0
-  m_Name: Square
+  m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

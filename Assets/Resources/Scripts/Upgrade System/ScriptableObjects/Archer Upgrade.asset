@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b02460d747e4be7449d3e50da07c8960, type: 3}
+  m_Name: Archer Upgrade
+  m_EditorClassIdentifier: 
+  UpgradeIcon: {fileID: 0}
+  UpgradeName: dwaadwdda
+  AffectAttackSpeed: 1
+  AttackSpeedFactor: 1.58
+  AffectDamage: 0
+  AttackDamageFactor: 1
+  AffectMoveSpeed: 0
+  MoveSpeedFactor: 1
+  MinimumWave: 1
+  FlavorText: This is a general upgrade.
