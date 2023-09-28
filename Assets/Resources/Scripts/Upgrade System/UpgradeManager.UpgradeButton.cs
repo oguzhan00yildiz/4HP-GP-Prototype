@@ -79,60 +79,99 @@ public partial class UpgradeManager
 
                 Debug.Log("Archer-specific upgrade info display isn't implemented yet!");
             }
+
             // General upgrade info.
             else
             {
-                float atkF = upgrade.AttackDamageFactor;
-                float atkSpdF = upgrade.AttackSpeedFactor;
-                float movSpdF = upgrade.MoveSpeedFactor;
-
-                int atkFPercentage, atkSpdPercentage, movSpdPercentage;
-
-                // Converting 0 to 1 multipliers to 0 to 100 percentages
-                atkFPercentage = 100 - Mathf.Abs(((int)(100 * atkF)) - 100);
-                atkSpdPercentage = 100 - Mathf.Abs(((int)(100 * atkSpdF)) - 100);
-                movSpdPercentage = 100 - Mathf.Abs(((int)(100 * movSpdF)) - 100);
+                float atkIncrease = upgrade.AttackDamagePercentageIncrease;
+                float atkSpdIncrease = upgrade.AttackSpeedPercentageIncrease;
+                float movSpdIncrease = upgrade.MoveSpeedPercentageIncrease;
+                float critDmgIncrease = upgrade.CritDamagePercentageIncrease;
+                float critChanceIncrease = upgrade.CritDmgChancePercentageIncrease;
+                float armorIncrease = upgrade.ArmorPercentageIncrease;
 
                 // If more than a 1% increase/decrease
-                if (upgrade.AffectDamage)
+                if (upgrade.AffectDamage && atkIncrease != 0)
                 {
-                    switch (atkF)
+                    switch (atkIncrease)
                     {
-                        case > 1.01f:
+                        case > 0:
                             // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{100 - atkFPercentage}% damage");
+                            builder.AppendLine($"<color=\"green\">+{atkIncrease}% damage");
                             break;
-                        case < 0.99f:
+                        case < 0:
                             // Add red-colored percentage ("-50% damage")
-                            builder.AppendLine($"<color=\"red\">-{100 - atkFPercentage}% damage");
+                            builder.AppendLine($"<color=\"red\">-{atkIncrease}% damage");
                             break;
                     }
                 }
 
                 // Doing the same as above for attack speed and movement speed
-                if (upgrade.AffectAttackSpeed)
+                if (upgrade.AffectAttackSpeed && atkSpdIncrease != 0)
                 {
-                    switch (atkSpdF)
+                    switch (atkSpdIncrease)
                     {
-                        case > 1.01f:
-                            builder.AppendLine($"<color=\"green\">+{100 - atkSpdPercentage}% attack speed");
+                        case > 0:
+                            builder.AppendLine($"<color=\"green\">+{atkSpdIncrease}% attack speed");
                             break;
-                        case < 0.99f:
-                            builder.AppendLine($"<color=\"red\">-{100 - atkSpdPercentage}% attack speed");
+                        case < 0:
+                            builder.AppendLine($"<color=\"red\">-{atkSpdIncrease}% attack speed");
                             break;
                     }
                 }
 
-                if (upgrade.AffectMoveSpeed)
+                if (upgrade.AffectMoveSpeed && movSpdIncrease != 0)
                 {
-                    switch (movSpdF)
+                    switch (movSpdIncrease)
                     {
-                        case > 1.01f:
+                        case > 0:
                             // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{100 - movSpdPercentage}% movement speed");
+                            builder.AppendLine($"<color=\"green\">+{movSpdIncrease}% movement speed");
                             break;
-                        case < 0.99f:
-                            builder.AppendLine($"<color=\"red\">-{100 - movSpdPercentage}% movement speed");
+                        case < 0:
+                            builder.AppendLine($"<color=\"red\">-{movSpdIncrease}% movement speed");
+                            break;
+                    }
+                }
+
+                if (upgrade.AffectArmor && armorIncrease != 0)
+                {
+                    switch (armorIncrease)
+                    {
+                        case > 0:
+                            // Add green-colored percentage ("+50% damage")
+                            builder.AppendLine($"<color=\"green\">+{armorIncrease}% armor");
+                            break;
+                        case < 0:
+                            builder.AppendLine($"<color=\"red\">-{armorIncrease}% armor");
+                            break;
+                    }
+                }
+
+                if (upgrade.AffectCritChance && critChanceIncrease != 0)
+                {
+                    switch (critChanceIncrease)
+                    {
+                        case > 0:
+                            // Add green-colored percentage ("+50% damage")
+                            builder.AppendLine($"<color=\"green\">+{critChanceIncrease}% critical chance");
+                            break;
+                        case < 0:
+                            builder.AppendLine($"<color=\"red\">-{critChanceIncrease}% critical chance");
+                            break;
+                    }
+                }
+
+                if (upgrade.AffectCritDmg && critDmgIncrease != 0)
+                {
+                    switch (critDmgIncrease)
+                    {
+                        case > 0:
+                            // Add green-colored percentage ("+50% damage")
+                            builder.AppendLine($"<color=\"green\">+{critDmgIncrease}% critical damage");
+                            break;
+                        case < 0:
+                            builder.AppendLine($"<color=\"red\">-{critDmgIncrease}% critical damage");
                             break;
                     }
                 }

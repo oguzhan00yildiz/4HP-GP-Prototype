@@ -154,6 +154,9 @@ public partial class UpgradeManager : MonoBehaviour
                 AvailableUpgrades.RemoveAt(randIndex);
             }
 
+            // Add check for type of player
+
+
             index++;
             count--;
         }
@@ -166,8 +169,6 @@ public partial class UpgradeManager : MonoBehaviour
         // Set each button up to have the correct info associated with the upgrade
         // First, pop random upgrades from the list, as many as we have buttons.
         var randUpgrades = PopRandomSuitableUpgrades(_upgradeButtons.Count);
-
-        Debug.Log(AvailableUpgrades.Count);
 
         // If no more available upgrades, don't show panel.
         if(randUpgrades.Length == 0)

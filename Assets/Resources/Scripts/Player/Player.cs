@@ -41,7 +41,7 @@ namespace PlayerLogic
                 .GetComponent<DamageScreenEffect>();
 
             // Show flash if not null
-            dmgFx?.ShowDamageFlash(true);
+            dmgFx?.ShowDamageFlash(false);
         }
 
         // Start is called before the first frame update
@@ -53,6 +53,8 @@ namespace PlayerLogic
         public void AddUpgrade(SkillUpgrade upgrade)
         {
             Debug.Log("Added upgrade to player");
+
+            PlayerAttackHandler.instance.ReceiveUpgrade(upgrade);
         }
 
         void Initialize()
