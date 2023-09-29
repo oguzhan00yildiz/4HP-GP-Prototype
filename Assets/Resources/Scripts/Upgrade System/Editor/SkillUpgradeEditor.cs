@@ -34,6 +34,8 @@ public class SkillUpgradeEditor : Editor
     }
     public override void OnInspectorGUI()
     {
+        base.OnInspectorGUI();
+        /*
         // Update the actual scriptable object for us to display
         serializedObject.Update();
 
@@ -62,5 +64,6 @@ public class SkillUpgradeEditor : Editor
         base.OnInspectorGUI();
 
         serializedObject.ApplyModifiedProperties();
+        */
     }
 }

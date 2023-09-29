@@ -14,12 +14,11 @@ namespace PlayerLogic
         [HideInInspector]
         public bool Attacking { get; private set; }
 
-        private Animator _attackAnimator;
-
         // This is a cached reference to a prefab
         private static GameObject _meleeEffect;
+
         [SerializeField]
-        private float _attackRate = 0.15f;
+        private float _meleeDelay = 0.15f;
         private float _timeAtLastMelee = 0;
         private float _timeAtLastProjectile = 0;
 
@@ -39,15 +38,13 @@ namespace PlayerLogic
             this.enemyLayer = enemyLayer;
         }
 
-        private void Awake()
+        private void OnEnable()
         {
             attackOrigin = transform.Find("AttackOrigin");
             instance = this;
         }
         private void Start()
         {
-            
-            _attackAnimator = attackOrigin.GetComponent<Animator>();
             _meleeEffect = Resources.Load<GameObject>("Prefabs/Effects/Attacks/MeleeSwing");
         }
 
@@ -67,10 +64,6 @@ namespace PlayerLogic
             }
         }
 
-        private void FixedUpdate()
-        {
-           
-        }
         void TryMeleeAttack()
         {
             // Calculate whether we can attack now
@@ -78,7 +71,7 @@ namespace PlayerLogic
             var timeSinceLastAttack = timeNow - _timeAtLastMelee;
 
             // If we attacked too short a duration ago, return (do not proceed)
-            if (timeSinceLastAttack < _attackRate)
+            if (timeSinceLastAttack < _meleeDelay)
                 return;
             
             _timeAtLastMelee = Time.time;
@@ -128,17 +121,28 @@ namespace PlayerLogic
             if (upgrade == null)
                 return;
 
-            // TODO: Add more upgrades, yes
-            // TODO: Actually change the damage given depending on upgrade stats
+            var effects = upgrade.Effects;
+            for(int i = 0; i < effects.Count; i++)
+            {
+                // Too small of a difference to take into account?
+                if (Mathf.Approximately(effects[i].Difference, 0))
+                    continue;
 
-            _meleeDamage *= upgrade.AttackDamageMultiplier;
+                var fxType = effects[i].Type;
+                switch (fxType)
+                {
+                    case SkillUpgrade.Effect.EffectType.AttackSpeed:
+                        _meleeDelay *= effects[i].Multiplier;
 
-            //Debug.Log($"Player now does {_meleeDamage * upgrade.AttackDamageMultiplier} dmg instead of {_meleeDamage}");
-        }
+                        // TODO: Affect possible projectile attack speeds
+                        break;
+                    case SkillUpgrade.Effect.EffectType.AttackDamage:
+                        _meleeDamage *= effects[i].Multiplier;
 
-        private void OnDrawGizmos()
-        {
-            Gizmos.DrawCube(attackOrigin.position, _meleeHitBox);
+                        // TODO: Affect possible projectile damages
+                        break;
+                }
+            }
         }
 
         void CreateMeleeEffect(bool flipX)
@@ -152,7 +156,7 @@ namespace PlayerLogic
             }
         }
 
-       public void Shoot()
+       public void TryFireProjectiles()
         {
             //create a fire rate
             var timeNow = Time.time;

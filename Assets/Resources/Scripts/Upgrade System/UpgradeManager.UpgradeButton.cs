@@ -83,97 +83,50 @@ public partial class UpgradeManager
             // General upgrade info.
             else
             {
-                float atkIncrease = upgrade.AttackDamagePercentageIncrease;
-                float atkSpdIncrease = upgrade.AttackSpeedPercentageIncrease;
-                float movSpdIncrease = upgrade.MoveSpeedPercentageIncrease;
-                float critDmgIncrease = upgrade.CritDamagePercentageIncrease;
-                float critChanceIncrease = upgrade.CritDmgChancePercentageIncrease;
-                float armorIncrease = upgrade.ArmorPercentageIncrease;
+                var fx = upgrade.Effects;
 
-                // If more than a 1% increase/decrease
-                if (upgrade.AffectDamage && atkIncrease != 0)
+                for (int i = 0; i < fx.Count; i++)
                 {
-                    switch (atkIncrease)
+                    // This particular effect from the list.
+                    var effect = fx[i];
+
+                    // Too small of a difference to display.
+                    if (Mathf.Approximately(effect.Difference, 0))
+                        continue;
+
+                    string displayType = "";
+
+                    // Display the effect type in a more readable format.
+                    switch (effect.Type)
                     {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{atkIncrease}% damage");
+
+                        case SkillUpgrade.Effect.EffectType.AttackDamage:
+                            displayType = "Damage";
                             break;
-                        case < 0:
-                            // Add red-colored percentage ("-50% damage")
-                            builder.AppendLine($"<color=\"red\">-{atkIncrease}% damage");
+                        case SkillUpgrade.Effect.EffectType.AttackSpeed:
+                            displayType = "Attack Speed";
+                            break;
+                        case SkillUpgrade.Effect.EffectType.MoveSpeed:
+                            displayType = "Movement Speed";
+                            break;
+                        case SkillUpgrade.Effect.EffectType.MaxHealth:
+                            displayType = "Health";
+                            break;
+                        case SkillUpgrade.Effect.EffectType.CritDamage:
+                            displayType = "Critical Damage";
+                            break;
+                        case SkillUpgrade.Effect.EffectType.CritChance:
+                            displayType = "Critical Chance";
+                            break;
+                        case SkillUpgrade.Effect.EffectType.Armor:
+                            displayType = "Armor";
                             break;
                     }
-                }
 
-                // Doing the same as above for attack speed and movement speed
-                if (upgrade.AffectAttackSpeed && atkSpdIncrease != 0)
-                {
-                    switch (atkSpdIncrease)
-                    {
-                        case > 0:
-                            builder.AppendLine($"<color=\"green\">+{atkSpdIncrease}% attack speed");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{atkSpdIncrease}% attack speed");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectMoveSpeed && movSpdIncrease != 0)
-                {
-                    switch (movSpdIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{movSpdIncrease}% movement speed");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{movSpdIncrease}% movement speed");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectArmor && armorIncrease != 0)
-                {
-                    switch (armorIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{armorIncrease}% armor");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{armorIncrease}% armor");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectCritChance && critChanceIncrease != 0)
-                {
-                    switch (critChanceIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{critChanceIncrease}% critical chance");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{critChanceIncrease}% critical chance");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectCritDmg && critDmgIncrease != 0)
-                {
-                    switch (critDmgIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{critDmgIncrease}% critical damage");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{critDmgIncrease}% critical damage");
-                            break;
-                    }
+                    if (effect.Difference > 0)
+                        builder.AppendLine($"<color=\"green\">+{effect.Difference}% {displayType}");
+                    else
+                        builder.AppendLine($"<color=\"red\">{effect.Difference}% {displayType}");
                 }
 
                 _uiInfoText.text = builder.ToString();

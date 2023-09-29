@@ -136,6 +136,9 @@ public partial class UpgradeManager : MonoBehaviour
         int index = 0;
         SkillUpgrade[] randomUpgrades = new SkillUpgrade[count];
 
+        if(AvailableUpgrades.Count == 0)
+            return new SkillUpgrade[0];
+
         if (count > AvailableUpgrades.Count)
             count = AvailableUpgrades.Count;
 

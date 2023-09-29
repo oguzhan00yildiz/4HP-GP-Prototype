@@ -23448,8 +23448,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackOrigin: {fileID: 1109684988}
-  _attackRate: 0.5
-  _meleeHitBox: {x: 1, y: 1.5, z: 1}
+  _meleeDelay: 0.45
+  _meleeHitBox: {x: 1.4, y: 1.5, z: 1}
   _meleeDamage: 10
   _projectileFireRate: 0.5
   enemyLayer:
