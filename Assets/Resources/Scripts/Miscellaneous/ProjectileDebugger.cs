@@ -10,7 +10,7 @@ public class ProjectileDebugger : MonoBehaviour
         for(int i = 0; i < 50; i++)
         {
             Vector2 target = Random.insideUnitCircle * 1000;
-            ProjectileManager.CreateProjectile(Vector2.zero, target, Color.green);
+            ProjectileManager.CreateArrow(Vector2.zero, target);
         }
     }
 

@@ -6,14 +6,26 @@ using Global;
 public class Projectile : MonoBehaviour
 {
     [SerializeField]
-    private float _speed;
+    protected float _speed;
     [SerializeField]
-    private int _damage;
+    protected int _damage;
 
-    private Vector2 _origin, _target;
-    private Transform _targetTransform;
+    protected Vector2 _origin, _target;
+    protected Transform _targetTransform;
 
-    private bool _hitEnemy = false;
+    protected bool _hitEnemy = false;
+
+    public virtual void InitializeProjectileWithTransform(Vector2 origin, Transform target, Color? color = null)
+    {
+        InitTransform(origin, target, color);
+        StartAnimating();
+    }
+
+    public virtual void InitializeProjectileWithVector(Vector2 origin, Vector2 target, Color? color = null)
+    {
+        InitVector(origin, target, color);
+        StartAnimating();
+    }
 
     /// <summary>
     /// Initialize projectile with a transform as target (will follow the transform's position changes)
@@ -21,31 +33,38 @@ public class Projectile : MonoBehaviour
     /// <param name="origin"></param>
     /// <param name="target"></param>
     /// <param name="color"></param>
-    public void InitializeProjectileWithTransform(Vector2 origin, Transform target, Color color)
+    /// 
+    protected virtual void InitTransform(Vector2 origin, Transform target, Color? color = null)
     {
         _origin = origin;
         _targetTransform = target;
 
-        // Set projectile sprite color
-        SpriteRenderer projectileSpriteRend = GetComponentInChildren<SpriteRenderer>();
-        projectileSpriteRend.color = color;
-
-        // Set "flight" particle color if there's a particle system (why is it so complicated??)
-
-        var sys = transform.Find("FlightParticles").GetComponent<ParticleSystem>();
-        var main = sys.main;
-        ParticleSystem.MinMaxGradient gradient = new()
+        if (color != null)
         {
-            color = new Color()
-            {
-                r = color.r,
-                g = color.g,
-                b = color.b,
-                a = 0.75f
-            }
-        };
-        main.startColor = gradient;
+            Color wantedColor = (Color)color;
+            // Set projectile sprite color
+            SpriteRenderer projectileSpriteRend = GetComponentInChildren<SpriteRenderer>();
+            projectileSpriteRend.color = wantedColor;
 
+            // Set "flight" particle color if there's a particle system (why is it so complicated??)
+            var sys = transform.Find("FlightParticles").GetComponent<ParticleSystem>();
+            var main = sys.main;
+            ParticleSystem.MinMaxGradient gradient = new()
+            {
+                color = new Color()
+                {
+                    r = wantedColor.r,
+                    g = wantedColor.g,
+                    b = wantedColor.b,
+                    a = 0.75f
+                }
+            };
+            main.startColor = gradient;
+        }
+    }
+
+    protected virtual void StartAnimating()
+    {
         StartCoroutine(AnimateProjectileToTarget());
     }
 
@@ -55,35 +74,37 @@ public class Projectile : MonoBehaviour
     /// <param name="origin"></param>
     /// <param name="target"></param>
     /// <param name="color"></param>
-    public void InitializeProjectileWithVector(Vector2 origin, Vector2 target, Color color)
+    protected virtual void InitVector(Vector2 origin, Vector2 target, Color? color = null)
     {
         _origin = origin;
         _target = target;
 
-        // Set projectile sprite color
-        SpriteRenderer projectileSpriteRend = GetComponentInChildren<SpriteRenderer>();
-        projectileSpriteRend.color = color;
-
-        // Set "flight" particle color if there's a particle system (why is it so complicated??)
-        var sys = transform.Find("FlightParticles").GetComponent<ParticleSystem>();
-        var main = sys.main;
-        ParticleSystem.MinMaxGradient gradient = new()
+        if (color != null)
         {
-            color = new Color()
-            {
-                r = color.r,
-                g = color.g,
-                b = color.b,
-                a = 0.75f
-            }
-        };
-        main.startColor = gradient;
+            Color wantedColor = (Color)color;
+            // Set projectile sprite color
+            SpriteRenderer projectileSpriteRend = GetComponentInChildren<SpriteRenderer>();
+            projectileSpriteRend.color = wantedColor;
 
-        StartCoroutine(AnimateProjectileToTarget());
+            // Set "flight" particle color if there's a particle system (why is it so complicated??)
+            var sys = transform.Find("FlightParticles").GetComponent<ParticleSystem>();
+            var main = sys.main;
+            ParticleSystem.MinMaxGradient gradient = new()
+            {
+                color = new Color()
+                {
+                    r = wantedColor.r,
+                    g = wantedColor.g,
+                    b = wantedColor.b,
+                    a = 0.75f
+                }
+            };
+            main.startColor = gradient;
+        }
     }
 
-    private Collider2D _hitCollision;
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected Collider2D _hitCollision;
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
@@ -94,12 +115,12 @@ public class Projectile : MonoBehaviour
 
     // Used to keep track of last known direction of projectile
     // in case the target transform is destroyed and is null
-    private Vector2 lastKnownDirection = Vector2.zero;
+    protected Vector2 lastKnownDirection = Vector2.zero;
 
     /// <summary>
     /// Animates projectile towards its target, either a transform or position
     /// </summary>
-    IEnumerator AnimateProjectileToTarget()
+    protected virtual IEnumerator AnimateProjectileToTarget()
     {
         float distance = Mathf.Infinity;
         int maxLifetimeFrames = 5000;
