@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PlayerLogic
@@ -19,10 +17,14 @@ namespace PlayerLogic
         public int Health { get; private set; }
         public Canvas Canvas { get; private set; }
 
+        private GameObject _nullObj;
+
         // Make sure singleton is functional to access public variables of
         // this player instance outside this class (such as in PlayerMovement, PlayerAttackHandler...)
         private void OnEnable()
         {
+
+
             if (instance != this && instance != null)
                 Destroy(this);
             else
@@ -45,7 +47,7 @@ namespace PlayerLogic
         }
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             Initialize();
         }

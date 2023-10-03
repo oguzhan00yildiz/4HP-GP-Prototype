@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ProjectileManager : MonoBehaviour
@@ -80,7 +78,7 @@ public class ProjectileManager : MonoBehaviour
 
     static GameObject InstantiateProjectile()
     {
-        if(_prefabCache == null )
+        if (_prefabCache == null)
         {
             _prefabCache = Resources.Load("Prefabs/Projectiles/BasicProjectile") as GameObject;
         }

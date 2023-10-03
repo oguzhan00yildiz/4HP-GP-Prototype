@@ -58,7 +58,7 @@ namespace PlayerLogic
             else
                 Attacking = false;
 
-            if(Input.GetKeyDown(KeyCode.K))
+            if (Input.GetKeyDown(KeyCode.K))
             {
                 Player.instance.TakeDamage(0);
             }
@@ -73,7 +73,7 @@ namespace PlayerLogic
             // If we attacked too short a duration ago, return (do not proceed)
             if (timeSinceLastAttack < _meleeDelay)
                 return;
-            
+
             _timeAtLastMelee = Time.time;
 
             // Turn player in the direction he is attacking and set flag to true
@@ -104,11 +104,6 @@ namespace PlayerLogic
                 if (!col.CompareTag("Enemy"))
                     continue;
 
-                var enemyData = col.GetComponent<EnemyData>();
-
-                if (enemyData == null)
-                    continue;
-
                 // TODO: Actually change the damage given depending on attack type
                 GameManager.Instance.EnemyHit(col.gameObject, Mathf.RoundToInt(_meleeDamage));
             }
@@ -122,19 +117,20 @@ namespace PlayerLogic
                 return;
 
             var effects = upgrade.Effects;
-            for(int i = 0; i < effects.Count; i++)
+            for (int i = 0; i < effects.Count; i++)
             {
                 // Too small of a difference to take into account?
                 if (Mathf.Approximately(effects[i].Difference, 0))
                     continue;
 
                 var fxType = effects[i].Type;
+
                 switch (fxType)
                 {
                     case SkillUpgrade.Effect.EffectType.AttackSpeed:
                         _meleeDelay *= effects[i].Multiplier;
 
-                        // TODO: Affect possible projectile attack speeds
+                        // TODO: Affect possible projectile attack speed
                         break;
                     case SkillUpgrade.Effect.EffectType.AttackDamage:
                         _meleeDamage *= effects[i].Multiplier;
@@ -156,7 +152,7 @@ namespace PlayerLogic
             }
         }
 
-       public void TryFireProjectiles()
+        public void TryFireProjectiles()
         {
             //create a fire rate
             var timeNow = Time.time;
@@ -194,7 +190,7 @@ namespace PlayerLogic
             }
         }
 
-           
+
 
 
 

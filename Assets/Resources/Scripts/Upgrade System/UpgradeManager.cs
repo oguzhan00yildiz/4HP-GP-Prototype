@@ -1,11 +1,8 @@
-using UnityEngine;
-using System.Collections.Generic;
-using System.IO;
-using TMPro;
-using PlayerLogic;
-using System;
-using Random = UnityEngine.Random;
 using Global;
+using PlayerLogic;
+using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public partial class UpgradeManager : MonoBehaviour
 {
@@ -21,11 +18,12 @@ public partial class UpgradeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if(instance != null && instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(this);
         }
-        else instance = this;
+        else
+            instance = this;
     }
 
     private void Start()
@@ -48,7 +46,7 @@ public partial class UpgradeManager : MonoBehaviour
 
         Transform buttonContainer = _upgradeButtonTemplate.transform.parent;
 
-        for(int i = 0; i < _numButtons; i++)
+        for (int i = 0; i < _numButtons; i++)
         {
             // Instantiate button from template as child of container
             // (has horizontal layout group automation)
@@ -70,49 +68,34 @@ public partial class UpgradeManager : MonoBehaviour
         }
 
         // Load the contents of this folder at this path into an array Object[]
-        var scriptableObjects = Resources.LoadAll("Scripts/Upgrade System/ScriptableObjects");
+        var upgrades = 
+            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects");
 
         // If the folder in the above path is empty, stop
-        if(scriptableObjects.Length == 0)
+        if (upgrades.Length == 0)
         {
             Debug.LogError("Scripts/Upgrade System/ScriptableObjects is empty! No upgrades available");
             TogglePanel(false);
             return;
         }
-        
-        for(int i = 0; i < scriptableObjects.Length; i++)
+
+        foreach (var upgrade in upgrades)
         {
-            SkillUpgrade foundUpgrade = null;
-
-            // Try casting the Object at [i] to SkillUpgrade, which should work if it's of the correct type
-            // (Essentially, check if it's the right type)
-            try
-            {
-                foundUpgrade = (SkillUpgrade)scriptableObjects[i];
-            }
-
-            // Catch the exception: can not cast to SkillUpgrade
-            // (so this Object is not compatible or is not of the type SkillUpgrade)
-            catch(InvalidCastException)
-            {
-                // Show error: wrong type of file found in scriptableobjects folder
-                Debug.LogError("Upgrade folder contains invalid objects! "
-                                    + "Should only have SkillUpgrade ScriptableObjects ");
-
-                // Skip to the next object in the upgrades array
-                continue;
-            }
-
             // Further check what kind of upgrade it is, and only add it to the list
             // if the character in use can "use" the upgrade
-            switch (foundUpgrade)
+            switch (upgrade)
             {
+                // If it's null, the scriptableObject found was not of type SkillUpgrade,
+                // continue
+                case null:
+                    Debug.LogError("HOLD ON! THIS SHOULD NEVER HAPPEN. TELL VILLE");
+                    continue;
                 // If found a tank upgrade and playing as one,
                 // or if found an archer upgrade and playing as one,
                 // add to the list
                 case TankUpgrade when CharacterInUse == Player.PlayerCharacter.Tank:
                 case ArcherUpgrade when CharacterInUse == Player.PlayerCharacter.Archer:
-                    AvailableUpgrades.Add(foundUpgrade);
+                    AvailableUpgrades.Add(upgrade);
                     break;
 
                 // If upgrade isn't of the right type for us, skip to the next upgrade in array
@@ -122,7 +105,7 @@ public partial class UpgradeManager : MonoBehaviour
 
                 // Should be a general upgrade, so add to the list.
                 default:
-                    AvailableUpgrades.Add(foundUpgrade);
+                    AvailableUpgrades.Add(upgrade);
                     continue;
             }
         }
@@ -136,13 +119,13 @@ public partial class UpgradeManager : MonoBehaviour
         int index = 0;
         SkillUpgrade[] randomUpgrades = new SkillUpgrade[count];
 
-        if(AvailableUpgrades.Count == 0)
+        if (AvailableUpgrades.Count == 0)
             return new SkillUpgrade[0];
 
         if (count > AvailableUpgrades.Count)
             count = AvailableUpgrades.Count;
 
-        while(count > 0)
+        while (count > 0)
         {
             // Get random index
             int randIndex = Random.Range(0, AvailableUpgrades.Count);
@@ -159,7 +142,6 @@ public partial class UpgradeManager : MonoBehaviour
 
             // Add check for type of player
 
-
             index++;
             count--;
         }
@@ -174,7 +156,7 @@ public partial class UpgradeManager : MonoBehaviour
         var randUpgrades = PopRandomSuitableUpgrades(_upgradeButtons.Count);
 
         // If no more available upgrades, don't show panel.
-        if(randUpgrades.Length == 0)
+        if (randUpgrades.Length == 0)
         {
             Debug.LogWarning("No more available upgrades! Not showing upgrade panel.");
             GameManager.Instance.PlayerSetReady();

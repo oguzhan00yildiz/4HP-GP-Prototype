@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Text;
 using TMPro;
-using System.Text;
+using UnityEngine;
+using UnityEngine.UI;
 
 public partial class UpgradeManager
 {
@@ -99,7 +99,6 @@ public partial class UpgradeManager
                     // Display the effect type in a more readable format.
                     switch (effect.Type)
                     {
-
                         case SkillUpgrade.Effect.EffectType.AttackDamage:
                             displayType = "Damage";
                             break;

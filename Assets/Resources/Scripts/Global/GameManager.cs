@@ -1,7 +1,7 @@
+using Enemies;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using Enemies;
 
 namespace Global
 {
@@ -20,10 +20,12 @@ namespace Global
         {
             get
             {
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                    return _instance;
                 _instance = FindObjectOfType<GameManager>();
 
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                    return _instance;
                 var obj = new GameObject("GameManager");
                 _instance = obj.AddComponent<GameManager>();
 
@@ -55,7 +57,8 @@ namespace Global
 
             StartCoroutine(UpdateHealthBar(enemyHit.GetComponent<EnemyData>(), initialHealth, remainingHealth));
 
-            if (remainingHealth <= 0) { EnemyKilled(enemyHit); }
+            if (remainingHealth <= 0)
+            { EnemyKilled(enemyHit); }
         }
 
         // Kills the enemy

@@ -27,10 +27,12 @@ namespace Enemies
         {
             get
             {
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                    return _instance;
                 _instance = FindObjectOfType<SpawnerManager>();
 
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                    return _instance;
                 var obj = new GameObject("SpawnerManager");
                 _instance = obj.AddComponent<SpawnerManager>();
 
@@ -67,22 +69,21 @@ namespace Enemies
 
             #endregion
 
-            // Generates the first wave AND SET WAVE TO ONE
-            // WHY DO WE NEED TO SET THIS TO 1??? IT KEEPS GOING TO 3
-            // currentWave = 1;
-            CalculateWaveBudget(); 
+            // Generates the first wave
+            CalculateWaveBudget();
         }
 
         void Update()
         {
             // Checking if we have more enemies to spawn
-            if (!(Time.time >= _nextSpawnTime) || _enemiesToSpawn.Count == 0) return;
+            if (!(Time.time >= _nextSpawnTime) || _enemiesToSpawn.Count == 0)
+                return;
             SpawnEnemy();
             _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
         }
 
         // This method decides the "budget" for the wave
-        private void CalculateWaveBudget() 
+        private void CalculateWaveBudget()
         {
             _waveBudget = currentWave * 10;
             GenerateEnemies();
@@ -96,7 +97,7 @@ namespace Enemies
 
             // LINQ expression to creates a list of all the unlocked enemies given the current wave
             var availableEnemies = _enemies.Where(enemy => enemy.unlockingWave <= currentWave && currentWave <= enemy.lastSpawningWave).ToList();
-            
+
             List<GameObject> generatedEnemies = new();
             var remainingBudget = _waveBudget;
 
@@ -121,7 +122,7 @@ namespace Enemies
                         availableEnemies.Remove(availableEnemies[randEnemyId]);
                 }
                 else
-                 availableEnemies.Remove(availableEnemies[randEnemyId]);
+                    availableEnemies.Remove(availableEnemies[randEnemyId]);
             }
 
             _enemiesToSpawn = generatedEnemies;
@@ -142,9 +143,10 @@ namespace Enemies
         }
 
         // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
-        private void SpawnEnemy() 
+        private void SpawnEnemy()
         {
-            if (_enemiesToSpawn.Count <= 0) return;
+            if (_enemiesToSpawn.Count <= 0)
+                return;
 
             // Spawning the list of enemies that has been generated
             Instantiate(_enemiesToSpawn[0], PickRandomSpawnPoint(), Quaternion.identity);

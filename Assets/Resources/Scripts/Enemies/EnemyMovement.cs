@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
@@ -6,7 +5,7 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private float _speed;
     //[SerializeField] private float _stoppingDistance = 0.0f;
     [SerializeField] private Rigidbody2D _rigidbody;
-    
+
 
     private Transform _target;
     private Vector3 _targetDirection;
@@ -15,7 +14,7 @@ public class EnemyMovement : MonoBehaviour
     {
         _target = FindObjectOfType<PlayerLogic.Player>().transform;
         _rigidbody = GetComponent<Rigidbody2D>();
-        if(_rigidbody == null)
+        if (_rigidbody == null)
         {
             _rigidbody = gameObject.AddComponent<Rigidbody2D>();
             _rigidbody.gravityScale = 0.0f;
@@ -25,7 +24,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void Update()
     {
-        if (_target != null) 
+        if (_target != null)
         {
             // Not normalized since we'll use magnitude to gauge distance
             Vector3 direction = (_target.position - transform.position);
@@ -34,7 +33,7 @@ public class EnemyMovement : MonoBehaviour
             // Move in fixed update
         }
     }
-    
+
 
     private void FixedUpdate()
     {

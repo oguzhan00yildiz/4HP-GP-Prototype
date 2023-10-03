@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraShake : MonoBehaviour
@@ -15,7 +14,7 @@ public class CameraShake : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void Shake(float magnitude, float duration)
@@ -28,9 +27,9 @@ public class CameraShake : MonoBehaviour
         // Stop mouselook, let this script handle the position
         CameraMouseLook mouseLook = GetComponent<CameraMouseLook>();
         mouseLook.EnableMouseLook = false;
-        
+
         Vector3 originalPos = _trans.position;
-        for(int x = 0; x < 25; x++)
+        for (int x = 0; x < 25; x++)
         {
             // Find random target in XY and set Z to original value
             Vector3 target = originalPos + (Vector3)Random.insideUnitCircle * magn;

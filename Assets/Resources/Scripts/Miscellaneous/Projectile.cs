@@ -1,7 +1,7 @@
-using System.Collections;
-using UnityEngine;
 using Enemies;
 using Global;
+using System.Collections;
+using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
@@ -181,7 +181,7 @@ public class Projectile : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        
+
         // Calculate distance again to check whether we are actually near our target
         // and can damage the enemy
         distance = Vector2.Distance(transform.position, _target);
@@ -205,7 +205,7 @@ public class Projectile : MonoBehaviour
         // Run explosion particles
         explosionParticles.Play();
 
-        while(explosionParticles.isPlaying)
+        while (explosionParticles.isPlaying)
         {
             yield return new WaitForEndOfFrame();
         }

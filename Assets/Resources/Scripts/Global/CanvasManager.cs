@@ -1,6 +1,4 @@
-using PlayerLogic;
 using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,10 +16,12 @@ namespace Global
         {
             get
             {
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                    return _instance;
                 _instance = FindObjectOfType<CanvasManager>();
 
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                    return _instance;
                 var obj = new GameObject("CanvasManager");
                 _instance = obj.AddComponent<CanvasManager>();
 

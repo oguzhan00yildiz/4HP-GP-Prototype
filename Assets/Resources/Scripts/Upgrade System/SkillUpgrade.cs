@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,22 +20,7 @@ public class SkillUpgrade : ScriptableObject
         public EffectType Type;
         [Tooltip("Percentage increase. 20 = 20%")]
         public float Difference;
-        public float Multiplier
-        {
-            get
-            {
-                if (Difference < 0)
-                {
-                    // If Difference is negative, divide by the absolute value to make it larger
-                    return 1 + (Mathf.Abs(Difference) / 100);
-                }
-                else
-                {
-                    // Otherwise, multiply by (1 + Difference / 100) to make it smaller
-                    return 1 + (Difference / 100);
-                }
-            }
-        }
+        public readonly float Multiplier => 1 + Mathf.Abs(Difference) / 100;
     }
 
     public List<Effect> Effects;

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraMouseLook : MonoBehaviour
@@ -21,7 +19,7 @@ public class CameraMouseLook : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!EnableMouseLook)
+        if (!EnableMouseLook)
             return;
 
         // Find mouse position and normalize with screen dimensions
