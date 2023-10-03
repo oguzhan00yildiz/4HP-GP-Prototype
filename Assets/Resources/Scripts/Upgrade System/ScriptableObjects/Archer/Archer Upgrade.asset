@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b02460d747e4be7449d3e50da07c8960, type: 3}
   m_Name: Archer Upgrade
   m_EditorClassIdentifier: 
-  StatChanges: []
+  StatChanges:
+  - AffectedStat: 0
+    Difference: 200
   UpgradeIcon: {fileID: 0}
   UpgradeName: 
   MinimumWave: 1
@@ -21,7 +23,7 @@ MonoBehaviour:
   GivenMultiShotUpgrade:
     Arrows: 0
     DisperseAngle: 0
-  GiveBurstShotUpgrade: 1
+  GiveBurstShotUpgrade: 0
   GivenBurstShotUpgrade:
     ArrowCount: 0
     BurstDelay: 0

@@ -6,12 +6,13 @@ namespace PlayerLogic
     public class PlayerAttackHandler : MonoBehaviour
     {
         [HideInInspector]
-        public Transform attackOrigin;
+        public Transform AttackOrigin;
 
         // To be used in tandem with movement script
         // so it doesn't flip the player around when trying to attack
         [HideInInspector]
         public bool Attacking { get; private set; }
+        
 
         // This is a cached reference to a prefab
         private static GameObject _meleeEffect;
@@ -23,25 +24,20 @@ namespace PlayerLogic
 
         [SerializeField] private Vector3 _meleeHitBox;
 
-        private bool _shouldAttack => EnemiesInRangeCheck();
-
         //this is setting popupdamage effect settings
         [SerializeField] private float _meleeDamage;
-        [SerializeField] private float _projectileFireRate;
+        [SerializeField] private float _projectileFireDelay;
         [SerializeField] LayerMask enemyLayer;
         [SerializeField] private float meleeDetectionRadius;
+        [SerializeField] private float projectileDetectionRadius;
         [HideInInspector]
         public static PlayerAttackHandler instance;
 
-        public PlayerAttackHandler(float projectileFireRate, LayerMask enemyLayer)
-        {
-            _projectileFireRate = projectileFireRate;
-            this.enemyLayer = enemyLayer;
-        }
+        private static GameObject _arrowCache;
 
         private void OnEnable()
         {
-            attackOrigin = transform.Find("AttackOrigin");
+            AttackOrigin = transform.Find("AttackOrigin");
             instance = this;
         }
         private void Start()
@@ -51,17 +47,19 @@ namespace PlayerLogic
 
         private void Update()
         {
-            if (_shouldAttack)
+            TryPerformAttacks();
+        }
+
+        private void TryPerformAttacks()
+        {
+            if (ShouldFireProjectiles(out Collider2D[] enemyColliders))
+            {
+                TryFireProjectiles(enemyColliders);
+            }
+
+            if (ShouldMelee(out _))
             {
                 TryMeleeAttack();
-                //Attacking = true;
-            }
-            else
-                //Attacking = false;
-
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                Player.instance.TakeDamage(0);
             }
         }
 
@@ -80,14 +78,7 @@ namespace PlayerLogic
             // Don't turn if player is not holding the attack key
             if (!Player.instance.Movement.AttackHeld)
             {
-                if (Player.instance.Movement.FacingLeft)
-                {
-                    CreateMeleeEffect(true);
-                }
-                else
-                {
-                    CreateMeleeEffect(false);
-                }
+                CreateMeleeEffect(Player.instance.Movement.FacingLeft);
             }
             // If holding attack key, turn player in the direction he is attacking
             else
@@ -110,7 +101,7 @@ namespace PlayerLogic
             }
 
             // Check for enemies hit
-            Vector2 overlapCenter = attackOrigin.position;
+            Vector2 overlapCenter = AttackOrigin.position;
 
             // Move center depending on player facing
             overlapCenter += Player.instance.Movement.FacingLeft ? Vector2.left : Vector2.right;
@@ -133,24 +124,34 @@ namespace PlayerLogic
             if (upgrade == null)
                 return;
 
-            var effects = upgrade.StatChanges;
-            for (int i = 0; i < effects.Count; i++)
+            if (upgrade is ArcherUpgrade)
+            {
+                // TODO: Implement multishot, burst shot, etc.
+            }
+            else if (upgrade is TankUpgrade)
+            {
+                // TODO: Implement shield hit upgrades etc.
+            }
+
+            var statChanges = upgrade.StatChanges;
+            for (int i = 0; i < statChanges.Count; i++)
             {
                 // Too small of a difference to take into account?
-                if (Mathf.Approximately(effects[i].Difference, 0))
+                if (Mathf.Approximately(statChanges[i].Difference, 0))
                     continue;
 
-                var fxType = effects[i].AffectedStat;
+                var stat = statChanges[i].AffectedStat;
 
-                switch (fxType)
+                switch (stat)
                 {
                     case SkillUpgrade.StatChange.Stat.AttackSpeed:
-                        _meleeDelay *= effects[i].Multiplier;
+                        _meleeDelay *= statChanges[i].Multiplier;
+                        _projectileFireDelay *= statChanges[i].Multiplier;
 
                         // TODO: Affect possible projectile attack speed
                         break;
                     case SkillUpgrade.StatChange.Stat.AttackDamage:
-                        _meleeDamage *= effects[i].Multiplier;
+                        _meleeDamage *= statChanges[i].Multiplier;
 
                         // TODO: Affect possible projectile damages
                         break;
@@ -160,7 +161,7 @@ namespace PlayerLogic
 
         void CreateMeleeEffect(bool flipX)
         {
-            var fx = Instantiate(_meleeEffect, attackOrigin.position, Quaternion.identity);
+            var fx = Instantiate(_meleeEffect, AttackOrigin.position, Quaternion.identity);
             var scale = fx.transform.localScale;
             if (flipX)
             {
@@ -169,55 +170,93 @@ namespace PlayerLogic
             }
         }
 
-        public bool EnemiesInRangeCheck()
+        public bool ShouldFireProjectiles(out Collider2D[] enemyColliders)
         {
             // Check whether there are any enemies in range
-            var hitCols = Physics2D.OverlapCircleAll(transform.position, meleeDetectionRadius, enemyLayer.value);
-            return hitCols.Length > 0;
+            enemyColliders
+                = Physics2D.OverlapCircleAll(
+                    transform.position, projectileDetectionRadius, enemyLayer.value);
+
+            return enemyColliders.Length > 0;
         }
-        public void TryFireProjectiles()
+
+        public bool ShouldMelee(out Collider2D[] enemyColliders)
         {
-            //create a fire rate
+            if (Player.instance.Character == Player.PlayerCharacter.Archer)
+            {
+                enemyColliders = null;
+                return false;
+            }
+
+            // Check whether there are any enemies in range
+            enemyColliders
+                = Physics2D.OverlapCircleAll(
+                    transform.position, meleeDetectionRadius, enemyLayer.value);
+
+            return enemyColliders.Length > 0;
+        }
+        public void TryFireProjectiles(Collider2D[] enemies)
+        {
+            // create a fire rate
             var timeNow = Time.time;
             var timeSinceLastAttack = timeNow - _timeAtLastProjectile;
 
-            // If we attacked too short a duration ago, return (do not proceed)
-            if (timeSinceLastAttack > _projectileFireRate)
+            if (enemies.Length == 0)
             {
-                _timeAtLastProjectile = Time.time;
-                var enemies = Physics2D.OverlapCircleAll(transform.position, meleeDetectionRadius, enemyLayer);
-
-                var closestEnemyDistance = Mathf.Infinity;
-                Transform target = null;
-                foreach (var enemy in enemies)
-                {
-                    Vector2 bulletDirection = enemy.transform.position - transform.position;
-                    var bulletDistance = bulletDirection.magnitude;
-                    if (bulletDistance < closestEnemyDistance)
-                    {
-                        closestEnemyDistance = bulletDistance;
-                        target = enemy.transform;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-                if (target == null)
-                {
-                    return;
-                }
-
-
-                ProjectileManager.CreateProjectile(transform.position, target, Color.cyan);
+                return;
             }
+
+            // If we attacked too short a duration ago, return (do not proceed)
+            if (timeSinceLastAttack < _projectileFireDelay) 
+                return;
+
+            _timeAtLastProjectile = Time.time;
+
+            var closestEnemyDistance = Mathf.Infinity;
+            Transform target = null;
+            foreach (var enemy in enemies)
+            {
+                Vector2 targetDirection = enemy.transform.position - transform.position;
+                var targetDistance = targetDirection.magnitude;
+
+                if (targetDistance > closestEnemyDistance)
+                    continue;
+
+                closestEnemyDistance = targetDistance;
+                target = enemy.transform;
+            }
+            if (target == null)
+            {
+                return;
+            }
+
+            FireArrow(transform.position, target);
         }
 
+        static GameObject InstantiateArrow()
+        {
+            if (_arrowCache == null)
+            {
+                _arrowCache = Resources.Load("Prefabs/Projectiles/BasicArrow") as GameObject;
+            }
 
+            return Instantiate(_arrowCache);
+        }
 
+        public void FireArrow(Vector2 origin, Transform target)
+        {
+            GameObject projectileObj = InstantiateArrow();
+            projectileObj.transform.position = transform.position;
 
+            ArrowProjectile proj = projectileObj.GetComponent<ArrowProjectile>();
 
+            if (proj == null)
+            {
+                Debug.LogError($"Projectile {projectileObj.name} doesn't have an ArrowProjectile component!", projectileObj);
+                return;
+            }
 
-
+            proj.InitializeProjectileWithVector(origin, target.position);
+        }
     }
 }

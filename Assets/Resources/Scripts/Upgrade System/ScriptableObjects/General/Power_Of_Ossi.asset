@@ -16,7 +16,7 @@ MonoBehaviour:
   - AffectedStat: 1
     Difference: 3
   - AffectedStat: 0
-    Difference: 7
+    Difference: 500
   UpgradeIcon: {fileID: -653619307, guid: e7538014b978b544aa3b7d19344fe7f7, type: 3}
   UpgradeName: Power of Ossi
   MinimumWave: 1

@@ -115,7 +115,7 @@ namespace PlayerLogic
             _modelRenderer.flipX = left;
 
             // Flip player attack origin when facing left
-            Player.instance.AttackHandler.attackOrigin.localScale = new Vector3()
+            Player.instance.AttackHandler.AttackOrigin.localScale = new Vector3()
             {
                 x = left ? -1 : 1,
                 y = 1,

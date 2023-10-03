@@ -21,7 +21,8 @@ public class SkillUpgrade : ScriptableObject
         public Stat AffectedStat;
         [Tooltip("Percentage increase. 20 = 20%")]
         public float Difference;
-        public readonly float Multiplier => 1 + Mathf.Abs(Difference) / 100;
+
+        public readonly float Multiplier => 1 + Difference / 100;
     }
 
     public List<StatChange> StatChanges;

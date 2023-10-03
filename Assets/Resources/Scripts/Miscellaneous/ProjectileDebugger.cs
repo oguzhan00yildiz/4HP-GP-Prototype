@@ -8,7 +8,7 @@ public class ProjectileDebugger : MonoBehaviour
         for (int i = 0; i < 50; i++)
         {
             Vector2 target = Random.insideUnitCircle * 1000;
-            ProjectileManager.CreateArrow(Vector2.zero, target);
+            //ProjectileManager.CreateArrow(Vector2.zero, target);
         }
     }
 

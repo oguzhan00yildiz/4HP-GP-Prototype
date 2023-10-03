@@ -70,6 +70,50 @@ public partial class UpgradeManager
             {
                 var tUpgrade = (TankUpgrade)upgrade;
 
+                // General stat changes.
+                var statChanges = tUpgrade.StatChanges;
+
+                foreach (var statChange in statChanges)
+                {
+                    // Too small of a difference to display.
+                    if (Mathf.Approximately(statChange.Difference, 0))
+                        continue;
+
+                    string statName = "";
+
+                    // Display the effect type in a more readable format.
+                    switch (statChange.AffectedStat)
+                    {
+                        case SkillUpgrade.StatChange.Stat.AttackDamage:
+                            statName = "Damage";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                            statName = "Attack Speed";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.MoveSpeed:
+                            statName = "Movement Speed";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.MaxHealth:
+                            statName = "Health";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.CritDamage:
+                            statName = "Critical Damage";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.CritChance:
+                            statName = "Critical Chance";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.Armor:
+                            statName = "Armor";
+                            break;
+                    }
+
+                    builder.AppendLine(statChange.Difference > 0
+                        ? $"<color=\"green\">+{statChange.Difference}% {statName}"
+                        : $"<color=\"red\">{statChange.Difference}% {statName}");
+                }
+
+                _uiInfoText.text = builder.ToString();
+
                 Debug.Log("Tank-specific upgrade info display isn't implemented yet!");
             }
 
@@ -78,12 +122,56 @@ public partial class UpgradeManager
             {
                 var aUpgrade = (ArcherUpgrade)upgrade;
 
+                // General stat changes.
+                var statChanges = aUpgrade.StatChanges;
+
+                foreach (var statChange in statChanges)
+                {
+                    // Too small of a difference to display.
+                    if (Mathf.Approximately(statChange.Difference, 0))
+                        continue;
+
+                    string statName = "";
+
+                    // Display the effect type in a more readable format.
+                    switch (statChange.AffectedStat)
+                    {
+                        case SkillUpgrade.StatChange.Stat.AttackDamage:
+                            statName = "Damage";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                            statName = "Attack Speed";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.MoveSpeed:
+                            statName = "Movement Speed";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.MaxHealth:
+                            statName = "Health";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.CritDamage:
+                            statName = "Critical Damage";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.CritChance:
+                            statName = "Critical Chance";
+                            break;
+                        case SkillUpgrade.StatChange.Stat.Armor:
+                            statName = "Armor";
+                            break;
+                    }
+
+                    builder.AppendLine(statChange.Difference > 0
+                        ? $"<color=\"green\">+{statChange.Difference}% {statName}"
+                        : $"<color=\"red\">{statChange.Difference}% {statName}");
+                }
+
+                _uiInfoText.text = builder.ToString();
+
                 Debug.Log("Archer-specific upgrade info display isn't implemented yet!");
             }
 
-            // General upgrade info.
             else
             {
+                // General stat changes.
                 var statChanges = upgrade.StatChanges;
 
                 foreach (var statChange in statChanges)
@@ -126,8 +214,8 @@ public partial class UpgradeManager
                 }
 
                 _uiInfoText.text = builder.ToString();
-                _uiFlavorText.text = upgrade.FlavorText;
             }
+            _uiFlavorText.text = upgrade.FlavorText;
         }
     }
 }

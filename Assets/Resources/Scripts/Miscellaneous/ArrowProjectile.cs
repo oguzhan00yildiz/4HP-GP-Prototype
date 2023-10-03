@@ -32,7 +32,7 @@ public class ArrowProjectile : Projectile
 
         Transform spriteContainer = transform.Find("SpriteContainer");
 
-        while (distance > 0.4f)
+        while (distance > 0.3f)
         {
             if (_targetTransform != null)
             {
@@ -68,7 +68,7 @@ public class ArrowProjectile : Projectile
             spriteContainer.rotation = _rotation;
 
             // If hit prematurely or lifetime is over max
-            // TODO: (_hit is not set anywhere yet)
+            // TODO: (_hitEnemy is not set anywhere yet)
             if (_hitEnemy || lifeFrames > maxLifetimeFrames)
                 break;
 
@@ -93,7 +93,7 @@ public class ArrowProjectile : Projectile
             GameManager.Instance.EnemyHit(enemyObj, _damage);
         }
 
-        // Destroy the gameobject
+        // Destroy the gameObject
         Destroy(gameObject);
     }
 }

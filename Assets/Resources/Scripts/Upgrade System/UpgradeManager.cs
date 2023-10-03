@@ -73,9 +73,9 @@ public partial class UpgradeManager : MonoBehaviour
             Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/General");
 
         var archerUpgrades =
-            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/Archer");
+            Resources.LoadAll<ArcherUpgrade>("Scripts/Upgrade System/ScriptableObjects/Archer");
         var tankUpgrades =
-            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/Tank");
+            Resources.LoadAll<TankUpgrade>("Scripts/Upgrade System/ScriptableObjects/Tank");
 
         int capacity = generalUpgrades.Length + archerUpgrades.Length + tankUpgrades.Length;
         List<SkillUpgrade> upgrades = new List<SkillUpgrade>(capacity);
@@ -104,7 +104,7 @@ public partial class UpgradeManager : MonoBehaviour
         if (tankUpgrades.Length == 0)
         {
             Debug.LogWarning(
-                "No archer upgrades found" +
+                "No tank upgrades found" +
                 " at Scripts/Upgrade System/ScriptableObjects/Archer");
         }
 
