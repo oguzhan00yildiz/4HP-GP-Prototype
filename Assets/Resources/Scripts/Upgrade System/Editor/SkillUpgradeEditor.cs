@@ -17,7 +17,7 @@ public class SkillUpgradeEditor : Editor
 
     private void OnEnable()
     {
-        // Find "Type" dropdown (enum) property
+        // Find "AffectedStat" dropdown (enum) property
         selectedTypeProp = serializedObject.FindProperty("TypeOfUpgrade");
         spriteProp = serializedObject.FindProperty("UpgradeIcon");
         nameProp = serializedObject.FindProperty("UpgradeName");

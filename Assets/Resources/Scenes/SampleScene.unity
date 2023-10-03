@@ -23079,7 +23079,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1751638051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23493,13 +23493,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackOrigin: {fileID: 1109684988}
   _meleeDelay: 0.45
-  _meleeHitBox: {x: 1.4, y: 1.5, z: 1}
+  _meleeHitBox: {x: 1.8, y: 1.5, z: 1}
   _meleeDamage: 10
   _projectileFireRate: 0.5
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
-  detectionRadius: 10
+  meleeDetectionRadius: 8
 --- !u!1 &1972537651
 GameObject:
   m_ObjectHideFlags: 0

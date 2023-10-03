@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0470f493bd139f9449de4cb5ce223f97, type: 3}
   m_Name: Power_Of_Ossi
   m_EditorClassIdentifier: 
-  Effects:
-  - Type: 1
-    Difference: 17
-  - Type: 0
-    Difference: -5
+  StatChanges:
+  - AffectedStat: 1
+    Difference: 3
+  - AffectedStat: 0
+    Difference: 7
   UpgradeIcon: {fileID: -653619307, guid: e7538014b978b544aa3b7d19344fe7f7, type: 3}
   UpgradeName: Power of Ossi
   MinimumWave: 1

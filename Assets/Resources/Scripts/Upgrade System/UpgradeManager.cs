@@ -67,12 +67,49 @@ public partial class UpgradeManager : MonoBehaviour
             _upgradeButtons[i].onClick.AddListener(() => SelectUpgrade(buttonIndex));
         }
 
-        // Load the contents of this folder at this path into an array Object[]
-        var upgrades = 
-            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects");
+        // Load contents from each folder into a list
+
+        var generalUpgrades =
+            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/General");
+
+        var archerUpgrades =
+            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/Archer");
+        var tankUpgrades =
+            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/Tank");
+
+        int capacity = generalUpgrades.Length + archerUpgrades.Length + tankUpgrades.Length;
+        List<SkillUpgrade> upgrades = new List<SkillUpgrade>(capacity);
+
+        // Add each array to the list
+        upgrades.AddRange(generalUpgrades);
+
+        if (generalUpgrades.Length == 0)
+        {
+            Debug.LogWarning(
+                "No general upgrades found" +
+                " at Scripts/Upgrade System/ScriptableObjects/General");
+        }
+
+        upgrades.AddRange(archerUpgrades);
+
+        if (archerUpgrades.Length == 0)
+        {
+            Debug.LogWarning(
+                "No archer upgrades found" +
+                " at Scripts/Upgrade System/ScriptableObjects/Archer");
+        }
+
+        upgrades.AddRange(tankUpgrades);
+
+        if (tankUpgrades.Length == 0)
+        {
+            Debug.LogWarning(
+                "No archer upgrades found" +
+                " at Scripts/Upgrade System/ScriptableObjects/Archer");
+        }
 
         // If the folder in the above path is empty, stop
-        if (upgrades.Length == 0)
+        if (upgrades.Count == 0)
         {
             Debug.LogError("Scripts/Upgrade System/ScriptableObjects is empty! No upgrades available");
             TogglePanel(false);

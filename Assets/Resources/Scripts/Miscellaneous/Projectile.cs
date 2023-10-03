@@ -1,4 +1,3 @@
-using Enemies;
 using Global;
 using System.Collections;
 using UnityEngine;
@@ -135,10 +134,9 @@ public class Projectile : MonoBehaviour
         // Set parent to null (unparent particles from projectile, remember to destroy)
         explosionParticles.transform.parent = null;
 
-        Vector2 direction = Vector2.zero;
-
         while (distance > 0.4f)
         {
+            Vector2 direction;
             if (_targetTransform != null)
             {
                 _target = _targetTransform.position;
@@ -187,7 +185,6 @@ public class Projectile : MonoBehaviour
         distance = Vector2.Distance(transform.position, _target);
         if (distance < 0.4f && _targetTransform != null)
         {
-            EnemyData data = _targetTransform.GetComponent<EnemyData>();
             GameManager.Instance.EnemyHit(_targetTransform.gameObject, _damage);
         }
 

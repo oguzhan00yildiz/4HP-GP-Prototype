@@ -72,6 +72,7 @@ public partial class UpgradeManager
 
                 Debug.Log("Tank-specific upgrade info display isn't implemented yet!");
             }
+
             // Archer-specific info.
             else if (upgrade is ArcherUpgrade)
             {
@@ -83,49 +84,45 @@ public partial class UpgradeManager
             // General upgrade info.
             else
             {
-                var fx = upgrade.Effects;
+                var statChanges = upgrade.StatChanges;
 
-                for (int i = 0; i < fx.Count; i++)
+                foreach (var statChange in statChanges)
                 {
-                    // This particular effect from the list.
-                    var effect = fx[i];
-
                     // Too small of a difference to display.
-                    if (Mathf.Approximately(effect.Difference, 0))
+                    if (Mathf.Approximately(statChange.Difference, 0))
                         continue;
 
-                    string displayType = "";
+                    string statName = "";
 
                     // Display the effect type in a more readable format.
-                    switch (effect.Type)
+                    switch (statChange.AffectedStat)
                     {
-                        case SkillUpgrade.Effect.EffectType.AttackDamage:
-                            displayType = "Damage";
+                        case SkillUpgrade.StatChange.Stat.AttackDamage:
+                            statName = "Damage";
                             break;
-                        case SkillUpgrade.Effect.EffectType.AttackSpeed:
-                            displayType = "Attack Speed";
+                        case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                            statName = "Attack Speed";
                             break;
-                        case SkillUpgrade.Effect.EffectType.MoveSpeed:
-                            displayType = "Movement Speed";
+                        case SkillUpgrade.StatChange.Stat.MoveSpeed:
+                            statName = "Movement Speed";
                             break;
-                        case SkillUpgrade.Effect.EffectType.MaxHealth:
-                            displayType = "Health";
+                        case SkillUpgrade.StatChange.Stat.MaxHealth:
+                            statName = "Health";
                             break;
-                        case SkillUpgrade.Effect.EffectType.CritDamage:
-                            displayType = "Critical Damage";
+                        case SkillUpgrade.StatChange.Stat.CritDamage:
+                            statName = "Critical Damage";
                             break;
-                        case SkillUpgrade.Effect.EffectType.CritChance:
-                            displayType = "Critical Chance";
+                        case SkillUpgrade.StatChange.Stat.CritChance:
+                            statName = "Critical Chance";
                             break;
-                        case SkillUpgrade.Effect.EffectType.Armor:
-                            displayType = "Armor";
+                        case SkillUpgrade.StatChange.Stat.Armor:
+                            statName = "Armor";
                             break;
                     }
 
-                    if (effect.Difference > 0)
-                        builder.AppendLine($"<color=\"green\">+{effect.Difference}% {displayType}");
-                    else
-                        builder.AppendLine($"<color=\"red\">{effect.Difference}% {displayType}");
+                    builder.AppendLine(statChange.Difference > 0
+                        ? $"<color=\"green\">+{statChange.Difference}% {statName}"
+                        : $"<color=\"red\">{statChange.Difference}% {statName}");
                 }
 
                 _uiInfoText.text = builder.ToString();

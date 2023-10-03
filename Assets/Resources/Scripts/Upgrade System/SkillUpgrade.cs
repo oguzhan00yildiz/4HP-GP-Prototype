@@ -5,9 +5,9 @@ using UnityEngine;
 public class SkillUpgrade : ScriptableObject
 {
     [System.Serializable]
-    public struct Effect
+    public struct StatChange
     {
-        public enum EffectType
+        public enum Stat
         {
             AttackSpeed,
             AttackDamage,
@@ -17,13 +17,14 @@ public class SkillUpgrade : ScriptableObject
             CritChance,
             Armor
         }
-        public EffectType Type;
+
+        public Stat AffectedStat;
         [Tooltip("Percentage increase. 20 = 20%")]
         public float Difference;
         public readonly float Multiplier => 1 + Mathf.Abs(Difference) / 100;
     }
 
-    public List<Effect> Effects;
+    public List<StatChange> StatChanges;
 
     public Sprite UpgradeIcon;
     public string UpgradeName;

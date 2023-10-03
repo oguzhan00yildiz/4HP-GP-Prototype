@@ -12,22 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b02460d747e4be7449d3e50da07c8960, type: 3}
   m_Name: Archer Upgrade
   m_EditorClassIdentifier: 
-  TypeOfUpgrade: 0
+  StatChanges: []
   UpgradeIcon: {fileID: 0}
-  UpgradeName: dwaadwdda
-  AffectAttackSpeed: 1
-  AttackSpeedPercentageIncrease: 1
-  AffectDamage: 0
-  AttackDamagePercentageIncrease: 1
-  AffectMoveSpeed: 0
-  MoveSpeedPercentageIncrease: 1
-  AffectMaxHealth: 0
-  MaxHealthPercentageIncrease: 1
-  AffectCritDmg: 0
-  CritDamagePercentageIncrease: 1
-  AffectCritChance: 0
-  CritDmgChancePercentageIncrease: 1
-  AffectArmor: 0
-  ArmorPercentageIncrease: 1
+  UpgradeName: 
   MinimumWave: 1
   FlavorText: This is a general upgrade.
+  GiveMultiShotUpgrade: 0
+  GivenMultiShotUpgrade:
+    Arrows: 0
+    DisperseAngle: 0
+  GiveBurstShotUpgrade: 1
+  GivenBurstShotUpgrade:
+    ArrowCount: 0
+    BurstDelay: 0

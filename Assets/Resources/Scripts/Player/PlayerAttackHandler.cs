@@ -1,4 +1,3 @@
-using Enemies;
 using Global;
 using UnityEngine;
 
@@ -24,17 +23,19 @@ namespace PlayerLogic
 
         [SerializeField] private Vector3 _meleeHitBox;
 
+        private bool _shouldAttack => EnemiesInRangeCheck();
+
         //this is setting popupdamage effect settings
         [SerializeField] private float _meleeDamage;
         [SerializeField] private float _projectileFireRate;
         [SerializeField] LayerMask enemyLayer;
-        [SerializeField] private float detectionRadius;
+        [SerializeField] private float meleeDetectionRadius;
         [HideInInspector]
         public static PlayerAttackHandler instance;
 
         public PlayerAttackHandler(float projectileFireRate, LayerMask enemyLayer)
         {
-            this._projectileFireRate = projectileFireRate;
+            _projectileFireRate = projectileFireRate;
             this.enemyLayer = enemyLayer;
         }
 
@@ -50,13 +51,13 @@ namespace PlayerLogic
 
         private void Update()
         {
-            if (Player.instance.Movement.AttackHeld)
+            if (_shouldAttack)
             {
                 TryMeleeAttack();
-                Attacking = true;
+                //Attacking = true;
             }
             else
-                Attacking = false;
+                //Attacking = false;
 
             if (Input.GetKeyDown(KeyCode.K))
             {
@@ -76,20 +77,36 @@ namespace PlayerLogic
 
             _timeAtLastMelee = Time.time;
 
-            // Turn player in the direction he is attacking and set flag to true
-            // (when mouse position x is less than the screen's width split in half, the mouse is on the left side)
-            if (Input.mousePosition.x < (float)Screen.width / 2)
+            // Don't turn if player is not holding the attack key
+            if (!Player.instance.Movement.AttackHeld)
             {
-                Player.instance.Movement.SetFacing(left: true);
-                CreateMeleeEffect(flipX: true);
+                if (Player.instance.Movement.FacingLeft)
+                {
+                    CreateMeleeEffect(true);
+                }
+                else
+                {
+                    CreateMeleeEffect(false);
+                }
             }
+            // If holding attack key, turn player in the direction he is attacking
             else
             {
-                // Only change it if we're facing left currently; otherwise leave it as is
-                if (Player.instance.Movement.FacingLeft)
-                    Player.instance.Movement.SetFacing(left: false);
+                // Turn player in the direction he is attacking and set flag to true
+                // (when mouse position x is less than the screen's width split in half, the mouse is on the left side)
+                if (Input.mousePosition.x < (float)Screen.width / 2)
+                {
+                    Player.instance.Movement.SetFacing(left: true);
+                    CreateMeleeEffect(flipX: true);
+                }
+                else
+                {
+                    // Only change it if we're facing left currently; otherwise leave it as is
+                    if (Player.instance.Movement.FacingLeft)
+                        Player.instance.Movement.SetFacing(left: false);
 
-                CreateMeleeEffect(flipX: false);
+                    CreateMeleeEffect(flipX: false);
+                }
             }
 
             // Check for enemies hit
@@ -116,23 +133,23 @@ namespace PlayerLogic
             if (upgrade == null)
                 return;
 
-            var effects = upgrade.Effects;
+            var effects = upgrade.StatChanges;
             for (int i = 0; i < effects.Count; i++)
             {
                 // Too small of a difference to take into account?
                 if (Mathf.Approximately(effects[i].Difference, 0))
                     continue;
 
-                var fxType = effects[i].Type;
+                var fxType = effects[i].AffectedStat;
 
                 switch (fxType)
                 {
-                    case SkillUpgrade.Effect.EffectType.AttackSpeed:
+                    case SkillUpgrade.StatChange.Stat.AttackSpeed:
                         _meleeDelay *= effects[i].Multiplier;
 
                         // TODO: Affect possible projectile attack speed
                         break;
-                    case SkillUpgrade.Effect.EffectType.AttackDamage:
+                    case SkillUpgrade.StatChange.Stat.AttackDamage:
                         _meleeDamage *= effects[i].Multiplier;
 
                         // TODO: Affect possible projectile damages
@@ -152,6 +169,12 @@ namespace PlayerLogic
             }
         }
 
+        public bool EnemiesInRangeCheck()
+        {
+            // Check whether there are any enemies in range
+            var hitCols = Physics2D.OverlapCircleAll(transform.position, meleeDetectionRadius, enemyLayer.value);
+            return hitCols.Length > 0;
+        }
         public void TryFireProjectiles()
         {
             //create a fire rate
@@ -162,7 +185,7 @@ namespace PlayerLogic
             if (timeSinceLastAttack > _projectileFireRate)
             {
                 _timeAtLastProjectile = Time.time;
-                var enemies = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayer);
+                var enemies = Physics2D.OverlapCircleAll(transform.position, meleeDetectionRadius, enemyLayer);
 
                 var closestEnemyDistance = Mathf.Infinity;
                 Transform target = null;
