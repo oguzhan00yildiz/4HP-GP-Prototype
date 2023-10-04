@@ -1,3 +1,4 @@
+using System;
 using Global;
 using PlayerLogic;
 using System.Collections.Generic;
@@ -6,9 +7,7 @@ using Random = UnityEngine.Random;
 
 public partial class UpgradeManager : MonoBehaviour
 {
-    public static UpgradeManager instance;
-    public Player.PlayerCharacter CharacterInUse;
-    public List<SkillUpgrade> AvailableUpgrades { get; private set; }
+    public List<StatUpgrade> AvailableUpgrades { get; private set; }
 
     [SerializeField] private int _numButtons;
     [SerializeField] private List<UpgradeButton> _upgradeButtons; // (3) buttons for selecting upgrades.
@@ -16,22 +15,7 @@ public partial class UpgradeManager : MonoBehaviour
 
     private GameObject _upgradeButtonTemplate;
 
-    private void OnEnable()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(this);
-        }
-        else
-            instance = this;
-    }
-
-    private void Start()
-    {
-        Initialize();
-    }
-
-    private void Initialize()
+    public void Initialize()
     {
         var canvas = GameObject.FindWithTag("Canvas").GetComponent<Canvas>();
 
@@ -42,7 +26,7 @@ public partial class UpgradeManager : MonoBehaviour
         _upgradeButtonTemplate =
             _upgradePanel.transform.Find("UpgradeButtonContainer/UpgradeButtonTemplate").gameObject;
 
-        AvailableUpgrades = new List<SkillUpgrade>();
+        AvailableUpgrades = new List<StatUpgrade>();
 
         Transform buttonContainer = _upgradeButtonTemplate.transform.parent;
 
@@ -70,7 +54,7 @@ public partial class UpgradeManager : MonoBehaviour
         // Load contents from each folder into a list
 
         var generalUpgrades =
-            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/General");
+            Resources.LoadAll<StatUpgrade>("Scripts/Upgrade System/ScriptableObjects/General");
 
         var archerUpgrades =
             Resources.LoadAll<ArcherUpgrade>("Scripts/Upgrade System/ScriptableObjects/Archer");
@@ -78,7 +62,7 @@ public partial class UpgradeManager : MonoBehaviour
             Resources.LoadAll<TankUpgrade>("Scripts/Upgrade System/ScriptableObjects/Tank");
 
         int capacity = generalUpgrades.Length + archerUpgrades.Length + tankUpgrades.Length;
-        List<SkillUpgrade> upgrades = new List<SkillUpgrade>(capacity);
+        List<StatUpgrade> upgrades = new List<StatUpgrade>(capacity);
 
         // Add each array to the list
         upgrades.AddRange(generalUpgrades);
@@ -105,7 +89,7 @@ public partial class UpgradeManager : MonoBehaviour
         {
             Debug.LogWarning(
                 "No tank upgrades found" +
-                " at Scripts/Upgrade System/ScriptableObjects/Archer");
+                " at Scripts/Upgrade System/ScriptableObjects/Tank");
         }
 
         // If the folder in the above path is empty, stop
@@ -120,9 +104,10 @@ public partial class UpgradeManager : MonoBehaviour
         {
             // Further check what kind of upgrade it is, and only add it to the list
             // if the character in use can "use" the upgrade
+            var character = GameManager.Player.Character;
             switch (upgrade)
             {
-                // If it's null, the scriptableObject found was not of type SkillUpgrade,
+                // If it's null, the scriptableObject found was not of type StatUpgrade,
                 // continue
                 case null:
                     Debug.LogError("HOLD ON! THIS SHOULD NEVER HAPPEN. TELL VILLE");
@@ -130,15 +115,10 @@ public partial class UpgradeManager : MonoBehaviour
                 // If found a tank upgrade and playing as one,
                 // or if found an archer upgrade and playing as one,
                 // add to the list
-                case TankUpgrade when CharacterInUse == Player.PlayerCharacter.Tank:
-                case ArcherUpgrade when CharacterInUse == Player.PlayerCharacter.Archer:
+                case TankUpgrade when character == IPlayer.PlayerCharacter.Tank:
+                case ArcherUpgrade when character == IPlayer.PlayerCharacter.Archer:
                     AvailableUpgrades.Add(upgrade);
                     break;
-
-                // If upgrade isn't of the right type for us, skip to the next upgrade in array
-                case TankUpgrade when CharacterInUse != Player.PlayerCharacter.Tank:
-                case ArcherUpgrade when CharacterInUse != Player.PlayerCharacter.Archer:
-                    continue;
 
                 // Should be a general upgrade, so add to the list.
                 default:
@@ -151,13 +131,13 @@ public partial class UpgradeManager : MonoBehaviour
     }
 
     // Pop: get and remove from list
-    public SkillUpgrade[] PopRandomSuitableUpgrades(int count)
+    private StatUpgrade[] PopRandomSuitableUpgrades(int count)
     {
         int index = 0;
-        SkillUpgrade[] randomUpgrades = new SkillUpgrade[count];
+        StatUpgrade[] randomUpgrades = new StatUpgrade[count];
 
         if (AvailableUpgrades.Count == 0)
-            return new SkillUpgrade[0];
+            return Array.Empty<StatUpgrade>();
 
         if (count > AvailableUpgrades.Count)
             count = AvailableUpgrades.Count;
@@ -171,7 +151,7 @@ public partial class UpgradeManager : MonoBehaviour
             var randUpgrade = AvailableUpgrades[randIndex];
 
             // Assign to array and remove from list, if minimum wave has been reached.
-            if (Enemies.SpawnerManager.Instance.currentWave >= randUpgrade.MinimumWave)
+            if (GameManager.EnemyManager.currentWave >= randUpgrade.MinimumWave)
             {
                 randomUpgrades[index] = AvailableUpgrades[randIndex];
                 AvailableUpgrades.RemoveAt(randIndex);
@@ -186,7 +166,7 @@ public partial class UpgradeManager : MonoBehaviour
         return randomUpgrades;
     }
 
-    void RefreshAndShowPanel()
+    private void RefreshAndShowPanel()
     {
         // Set each button up to have the correct info associated with the upgrade
         // First, pop random upgrades from the list, as many as we have buttons.
@@ -227,7 +207,7 @@ public partial class UpgradeManager : MonoBehaviour
     public void SelectUpgrade(int buttonIndex)
     {
         var upgrade = _upgradeButtons[buttonIndex].Upgrade;
-        Player.instance.AddUpgrade(upgrade);
+        GameManager.Player.ReceiveUpgrade(upgrade);
         TogglePanel(false);
         GameManager.Instance.PlayerSetReady();
     }

@@ -9,7 +9,7 @@ public partial class UpgradeManager
     // Without having to do GetComponent every time we want to access text and image in the button etc
     private class UpgradeButton
     {
-        public SkillUpgrade Upgrade;
+        public StatUpgrade Upgrade;
         private Button _uiButton;
         private Image _uiImage;
         private TMP_Text _uiTitle;
@@ -50,7 +50,7 @@ public partial class UpgradeManager
             _uiButton.gameObject.SetActive(value);
         }
 
-        public void SetInfoFromUpgrade(SkillUpgrade upgrade)
+        public void SetInfoFromUpgrade(StatUpgrade upgrade)
         {
             // Store upgrade in this button.
             Upgrade = upgrade;
@@ -84,25 +84,25 @@ public partial class UpgradeManager
                     // Display the effect type in a more readable format.
                     switch (statChange.AffectedStat)
                     {
-                        case SkillUpgrade.StatChange.Stat.AttackDamage:
+                        case StatUpgrade.Stat.AttackDamage:
                             statName = "Damage";
                             break;
-                        case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                        case StatUpgrade.Stat.AttackSpeed:
                             statName = "Attack Speed";
                             break;
-                        case SkillUpgrade.StatChange.Stat.MoveSpeed:
+                        case StatUpgrade.Stat.MoveSpeed:
                             statName = "Movement Speed";
                             break;
-                        case SkillUpgrade.StatChange.Stat.MaxHealth:
+                        case StatUpgrade.Stat.MaxHealth:
                             statName = "Health";
                             break;
-                        case SkillUpgrade.StatChange.Stat.CritDamage:
+                        case StatUpgrade.Stat.CritDamage:
                             statName = "Critical Damage";
                             break;
-                        case SkillUpgrade.StatChange.Stat.CritChance:
+                        case StatUpgrade.Stat.CritChance:
                             statName = "Critical Chance";
                             break;
-                        case SkillUpgrade.StatChange.Stat.Armor:
+                        case StatUpgrade.Stat.Armor:
                             statName = "Armor";
                             break;
                     }
@@ -136,25 +136,25 @@ public partial class UpgradeManager
                     // Display the effect type in a more readable format.
                     switch (statChange.AffectedStat)
                     {
-                        case SkillUpgrade.StatChange.Stat.AttackDamage:
+                        case StatUpgrade.Stat.AttackDamage:
                             statName = "Damage";
                             break;
-                        case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                        case StatUpgrade.Stat.AttackSpeed:
                             statName = "Attack Speed";
                             break;
-                        case SkillUpgrade.StatChange.Stat.MoveSpeed:
+                        case StatUpgrade.Stat.MoveSpeed:
                             statName = "Movement Speed";
                             break;
-                        case SkillUpgrade.StatChange.Stat.MaxHealth:
+                        case StatUpgrade.Stat.MaxHealth:
                             statName = "Health";
                             break;
-                        case SkillUpgrade.StatChange.Stat.CritDamage:
+                        case StatUpgrade.Stat.CritDamage:
                             statName = "Critical Damage";
                             break;
-                        case SkillUpgrade.StatChange.Stat.CritChance:
+                        case StatUpgrade.Stat.CritChance:
                             statName = "Critical Chance";
                             break;
-                        case SkillUpgrade.StatChange.Stat.Armor:
+                        case StatUpgrade.Stat.Armor:
                             statName = "Armor";
                             break;
                     }
@@ -185,25 +185,25 @@ public partial class UpgradeManager
                     // Display the effect type in a more readable format.
                     switch (statChange.AffectedStat)
                     {
-                        case SkillUpgrade.StatChange.Stat.AttackDamage:
+                        case StatUpgrade.Stat.AttackDamage:
                             statName = "Damage";
                             break;
-                        case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                        case StatUpgrade.Stat.AttackSpeed:
                             statName = "Attack Speed";
                             break;
-                        case SkillUpgrade.StatChange.Stat.MoveSpeed:
+                        case StatUpgrade.Stat.MoveSpeed:
                             statName = "Movement Speed";
                             break;
-                        case SkillUpgrade.StatChange.Stat.MaxHealth:
+                        case StatUpgrade.Stat.MaxHealth:
                             statName = "Health";
                             break;
-                        case SkillUpgrade.StatChange.Stat.CritDamage:
+                        case StatUpgrade.Stat.CritDamage:
                             statName = "Critical Damage";
                             break;
-                        case SkillUpgrade.StatChange.Stat.CritChance:
+                        case StatUpgrade.Stat.CritChance:
                             statName = "Critical Chance";
                             break;
-                        case SkillUpgrade.StatChange.Stat.Armor:
+                        case StatUpgrade.Stat.Armor:
                             statName = "Armor";
                             break;
                     }

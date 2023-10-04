@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class CameraMouseLook : MonoBehaviour
+[RequireComponent(typeof(CameraShake))]
+public class CameraController : MonoBehaviour
 {
     public bool EnableMouseLook;
     [SerializeField] private Transform _center;
@@ -10,6 +11,11 @@ public class CameraMouseLook : MonoBehaviour
     private Vector2 _camWorldPos;
     public Vector2 MouseScreenPosition { get; private set; }
     public CameraShake Shaker { get; private set; }
+
+    public void Initialize(Transform centerTarget)
+    {
+        _center = centerTarget;
+    }
 
     private void Start()
     {

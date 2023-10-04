@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Archer Upgrade", menuName = "Upgrades/Archer Upgrade", order = 2)]
-public class ArcherUpgrade : SkillUpgrade
+public class ArcherUpgrade : StatUpgrade
 {
     [System.Serializable]
     public struct MultiShotUpgrade

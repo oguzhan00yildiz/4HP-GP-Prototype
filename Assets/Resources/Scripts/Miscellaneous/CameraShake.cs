@@ -25,7 +25,7 @@ public class CameraShake : MonoBehaviour
     IEnumerator ShakeCoroutine(float magn, float dur)
     {
         // Stop mouselook, let this script handle the position
-        CameraMouseLook mouseLook = GetComponent<CameraMouseLook>();
+        CameraController mouseLook = GetComponent<CameraController>();
         mouseLook.EnableMouseLook = false;
 
         Vector3 originalPos = _trans.position;

@@ -2,27 +2,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "General Upgrade", menuName = "Upgrades/General Upgrade", order = 0)]
-public class SkillUpgrade : ScriptableObject
+public class StatUpgrade : ScriptableObject
 {
     [System.Serializable]
     public struct StatChange
     {
-        public enum Stat
-        {
-            AttackSpeed,
-            AttackDamage,
-            MoveSpeed,
-            MaxHealth,
-            CritDamage,
-            CritChance,
-            Armor
-        }
-
         public Stat AffectedStat;
-        [Tooltip("Percentage increase. 20 = 20%")]
+
+        [Tooltip("Percentage increase. 20 = +20%")]
         public float Difference;
 
-        public readonly float Multiplier => 1 + Difference / 100;
+        public readonly float Multiplier => 1.0f + (Difference / 100);
+    }
+
+    public enum Stat
+    {
+        AttackSpeed,
+        MeleeRange,
+        AttackDamage,
+        MoveSpeed,
+        MaxHealth,
+        CritDamage,
+        CritChance,
+        Armor
     }
 
     public List<StatChange> StatChanges;
