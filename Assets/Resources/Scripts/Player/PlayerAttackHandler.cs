@@ -1,47 +1,170 @@
 using Global;
 using UnityEngine;
+using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 namespace PlayerLogic
 {
     public class PlayerAttackHandler : MonoBehaviour
     {
+        #region StatInfoClasses
+        public abstract class PlayerStatInfo
+        {
+            public List<StatUpgrade> Upgrades { get; set; }
+
+            protected int LastKnownListLength;
+            protected Dictionary<StatUpgrade.Stat, float> LastKnownStats;
+            protected Dictionary<StatUpgrade.Stat, float> InitialStats;
+
+            public float GetInitialStat(StatUpgrade.Stat stat)
+            {
+                return InitialStats[stat];
+            }
+
+            public float GetTotalStat(StatUpgrade.Stat stat)
+            {
+                // If the list of upgrades is the same length as last time, don't recalculate
+                if (LastKnownListLength == Upgrades.Count)
+                    return LastKnownStats[stat];
+
+                float startingValue = GetInitialStat(stat);
+
+                float total = startingValue;
+
+                foreach (var upgrade in Upgrades)
+                {
+                    var statChanges = upgrade.StatChanges;
+
+                    if(statChanges.Count == 0)
+                        continue;
+
+                    foreach (var change in statChanges)
+                    {
+                        if(change.AffectedStat != stat)
+                            continue;
+
+                        total *= change.Multiplier;
+                    }
+                }
+
+                return total;
+            }
+
+            public abstract void AddUpgrade(StatUpgrade upgrade);
+        }
+        
+        private class TankStats : PlayerStatInfo
+        {
+            public TankStats()
+            {
+                _tankUpgrades = new List<TankUpgrade>();
+                Upgrades = new List<StatUpgrade>();
+                InitialStats = new Dictionary<StatUpgrade.Stat, float>
+                {
+                    { StatUpgrade.Stat.AttackDamage, Const.Player.STATS_TANK_ATTACK_DAMAGE },
+                    { StatUpgrade.Stat.AttackSpeed, Const.Player.STATS_TANK_ATTACK_SPEED },
+                    { StatUpgrade.Stat.CritChance, Const.Player.STATS_TANK_CRIT_CHANCE },
+                    { StatUpgrade.Stat.CritDamage, Const.Player.STATS_TANK_CRIT_DAMAGE },
+                    { StatUpgrade.Stat.MaxHealth, Const.Player.STATS_TANK_HEALTH },
+                    { StatUpgrade.Stat.MoveSpeed, Const.Player.STATS_TANK_SPEED },
+                    { StatUpgrade.Stat.Armor, Const.Player.STATS_TANK_ARMOR }
+                };
+            }
+
+            private List<TankUpgrade> _tankUpgrades;
+            public override void AddUpgrade(StatUpgrade upgrade)
+            {
+                switch(upgrade)
+                {
+                    case null:
+                        Debug.LogWarning("Tried to add null upgrade to tank upgrade list.");
+                        return;
+                    case TankUpgrade tankUpgrade:
+                        _tankUpgrades.Add(tankUpgrade);
+                        break;
+                    default:
+                        Upgrades.Add(upgrade);
+                        break;
+                }
+            }
+        }
+
+        private class ArcherStats : PlayerStatInfo
+        {
+            public ArcherStats()
+            {
+                _archerUpgrades = new List<ArcherUpgrade>();
+                Upgrades = new List<StatUpgrade>();
+                InitialStats = new Dictionary<StatUpgrade.Stat, float>
+                {
+                    { StatUpgrade.Stat.AttackDamage, Const.Player.STATS_ARCHER_ATTACK_DAMAGE },
+                    { StatUpgrade.Stat.AttackSpeed, Const.Player.STATS_ARCHER_ATTACK_SPEED },
+                    { StatUpgrade.Stat.CritChance, Const.Player.STATS_ARCHER_CRIT_CHANCE },
+                    { StatUpgrade.Stat.CritDamage, Const.Player.STATS_ARCHER_CRIT_DAMAGE },
+                    { StatUpgrade.Stat.MaxHealth, Const.Player.STATS_ARCHER_HEALTH },
+                    { StatUpgrade.Stat.MoveSpeed, Const.Player.STATS_ARCHER_SPEED },
+                    { StatUpgrade.Stat.Armor, Const.Player.STATS_ARCHER_ARMOR }
+                };
+            }
+
+            private List<ArcherUpgrade> _archerUpgrades;
+            public override void AddUpgrade(StatUpgrade upgrade)
+            {
+                switch(upgrade)
+                {
+                    case null:
+                        Debug.LogWarning("Tried to add null upgrade to archer upgrade list.");
+                        return;
+                    case ArcherUpgrade archerUpgrade:
+                        _archerUpgrades.Add(archerUpgrade);
+                        break;
+                    default:
+                        Upgrades.Add(upgrade);
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        public Transform AttackOrigin => _attackOrigin;
+
         [HideInInspector]
-        public Transform AttackOrigin;
+        private Transform _attackOrigin;
 
         // To be used in tandem with movement script
         // so it doesn't flip the player around when trying to attack
         [HideInInspector]
         public bool Attacking { get; private set; }
-        
+
+        private PlayerMovement _movement;
 
         // This is a cached reference to a prefab
         private static GameObject _meleeEffect;
 
-        [SerializeField]
-        private float _meleeDelay = 0.15f;
         private float _timeAtLastMelee = 0;
         private float _timeAtLastProjectile = 0;
 
-        [SerializeField] private Vector3 _meleeHitBox;
-
-        //this is setting popupdamage effect settings
         [SerializeField] private float _meleeDamage;
-        [SerializeField] private float _projectileFireDelay;
-        [SerializeField] LayerMask enemyLayer;
-        [SerializeField] private float meleeDetectionRadius;
-        [SerializeField] private float projectileDetectionRadius;
-        [HideInInspector]
-        public static PlayerAttackHandler instance;
+        [SerializeField] LayerMask _enemyLayer;
 
         private static GameObject _arrowCache;
 
-        private void OnEnable()
-        {
-            AttackOrigin = transform.Find("AttackOrigin");
-            instance = this;
-        }
+        private PlayerStatInfo _stats;
+
         private void Start()
         {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            _stats
+                = GameManager.Player.Character == Player.PlayerCharacter.Archer
+                    ? new ArcherStats()
+                    : new TankStats();
+
+            _attackOrigin = transform.Find("AttackOrigin");
+            _movement = GameManager.Player.Movement;
             _meleeEffect = Resources.Load<GameObject>("Prefabs/Effects/Attacks/MeleeSwing");
         }
 
@@ -69,16 +192,22 @@ namespace PlayerLogic
             var timeNow = Time.time;
             var timeSinceLastAttack = timeNow - _timeAtLastMelee;
 
+            float attackDelay 
+                = _stats.GetTotalStat(StatUpgrade.Stat.AttackSpeed);
+
+            float meleeRange
+                = _stats.GetTotalStat(StatUpgrade.Stat.MeleeRange);
+
             // If we attacked too short a duration ago, return (do not proceed)
-            if (timeSinceLastAttack < _meleeDelay)
+            if (timeSinceLastAttack < attackDelay)
                 return;
 
             _timeAtLastMelee = Time.time;
 
             // Don't turn if player is not holding the attack key
-            if (!Player.instance.Movement.AttackHeld)
+            if (!GameManager.Player.Movement.AttackHeld)
             {
-                CreateMeleeEffect(Player.instance.Movement.FacingLeft);
+                CreateMeleeEffect(_movement.FacingLeft);
             }
             // If holding attack key, turn player in the direction he is attacking
             else
@@ -87,52 +216,57 @@ namespace PlayerLogic
                 // (when mouse position x is less than the screen's width split in half, the mouse is on the left side)
                 if (Input.mousePosition.x < (float)Screen.width / 2)
                 {
-                    Player.instance.Movement.SetFacing(left: true);
+                    _movement.SetFacing(left: true);
                     CreateMeleeEffect(flipX: true);
                 }
                 else
                 {
                     // Only change it if we're facing left currently; otherwise leave it as is
-                    if (Player.instance.Movement.FacingLeft)
-                        Player.instance.Movement.SetFacing(left: false);
+                    if (_movement.FacingLeft)
+                        _movement.SetFacing(left: false);
 
                     CreateMeleeEffect(flipX: false);
                 }
             }
 
             // Check for enemies hit
-            Vector2 overlapCenter = AttackOrigin.position;
+            Vector2 overlapCenter = _attackOrigin.position;
 
             // Move center depending on player facing
-            overlapCenter += Player.instance.Movement.FacingLeft ? Vector2.left : Vector2.right;
-            var hitCols = Physics2D.OverlapBoxAll(overlapCenter, _meleeHitBox, 0);
+            overlapCenter += _movement.FacingLeft ? Vector2.left : Vector2.right;
+            var hitCols = Physics2D.OverlapBoxAll(overlapCenter, Vector2.one * meleeRange, 0);
 
             foreach (var col in hitCols)
             {
                 if (!col.CompareTag("Enemy"))
                     continue;
 
-                // TODO: Actually change the damage given depending on attack type
-                GameManager.Instance.EnemyHit(col.gameObject, Mathf.RoundToInt(_meleeDamage));
+                // Get damage from stats
+                var damage = _stats.GetTotalStat(StatUpgrade.Stat.AttackDamage);
+
+                GameManager.Instance.EnemyHit(col.gameObject, Mathf.RoundToInt(damage));
             }
         }
 
         // Actually receive the upgrade and update the player's stats
         // according to the upgrade
-        public void ReceiveUpgrade(SkillUpgrade upgrade)
+        public void ReceiveUpgrade(StatUpgrade upgrade)
         {
             if (upgrade == null)
                 return;
 
-            if (upgrade is ArcherUpgrade)
+            if (upgrade is ArcherUpgrade 
+                && GameManager.Player.Character == Player.PlayerCharacter.Archer)
             {
-                // TODO: Implement multishot, burst shot, etc.
+                // TODO: Implement multi-shot, burst shot, etc.
             }
-            else if (upgrade is TankUpgrade)
+            else if (upgrade is TankUpgrade
+                     && GameManager.Player.Character == Player.PlayerCharacter.Tank)
             {
                 // TODO: Implement shield hit upgrades etc.
             }
 
+            /*
             var statChanges = upgrade.StatChanges;
             for (int i = 0; i < statChanges.Count; i++)
             {
@@ -144,24 +278,25 @@ namespace PlayerLogic
 
                 switch (stat)
                 {
-                    case SkillUpgrade.StatChange.Stat.AttackSpeed:
+                    case StatUpgrade.StatChange.Stat.AttackSpeed:
                         _meleeDelay *= statChanges[i].Multiplier;
                         _projectileFireDelay *= statChanges[i].Multiplier;
 
                         // TODO: Affect possible projectile attack speed
                         break;
-                    case SkillUpgrade.StatChange.Stat.AttackDamage:
+                    case StatUpgrade.StatChange.Stat.AttackDamage:
                         _meleeDamage *= statChanges[i].Multiplier;
 
                         // TODO: Affect possible projectile damages
                         break;
                 }
             }
+            */
         }
 
         void CreateMeleeEffect(bool flipX)
         {
-            var fx = Instantiate(_meleeEffect, AttackOrigin.position, Quaternion.identity);
+            var fx = Instantiate(_meleeEffect, _attackOrigin.position, Quaternion.identity);
             var scale = fx.transform.localScale;
             if (flipX)
             {
@@ -170,30 +305,30 @@ namespace PlayerLogic
             }
         }
 
-        public bool ShouldFireProjectiles(out Collider2D[] enemyColliders)
+        public bool ShouldFireProjectiles(out Collider2D[] collidersHit)
         {
             // Check whether there are any enemies in range
-            enemyColliders
+            collidersHit
                 = Physics2D.OverlapCircleAll(
-                    transform.position, projectileDetectionRadius, enemyLayer.value);
+                    transform.position, Const.Player.PROJECTILE_FIRE_TRIGGER_RADIUS, _enemyLayer.value);
 
-            return enemyColliders.Length > 0;
+            return collidersHit.Length > 0;
         }
 
-        public bool ShouldMelee(out Collider2D[] enemyColliders)
+        public bool ShouldMelee(out Collider2D[] collidersHit)
         {
             if (Player.instance.Character == Player.PlayerCharacter.Archer)
             {
-                enemyColliders = null;
+                collidersHit = null;
                 return false;
             }
 
             // Check whether there are any enemies in range
-            enemyColliders
+            collidersHit
                 = Physics2D.OverlapCircleAll(
-                    transform.position, meleeDetectionRadius, enemyLayer.value);
+                    transform.position, Const.Player.MELEEATTACK_TRIGGER_RADIUS, _enemyLayer.value);
 
-            return enemyColliders.Length > 0;
+            return collidersHit.Length > 0;
         }
         public void TryFireProjectiles(Collider2D[] enemies)
         {
@@ -207,7 +342,7 @@ namespace PlayerLogic
             }
 
             // If we attacked too short a duration ago, return (do not proceed)
-            if (timeSinceLastAttack < _projectileFireDelay) 
+            if (timeSinceLastAttack < _stats.GetTotalStat(StatUpgrade.Stat.AttackSpeed)) 
                 return;
 
             _timeAtLastProjectile = Time.time;
@@ -248,7 +383,7 @@ namespace PlayerLogic
             GameObject projectileObj = InstantiateArrow();
             projectileObj.transform.position = transform.position;
 
-            ArrowProjectile proj = projectileObj.GetComponent<ArrowProjectile>();
+            var proj = projectileObj.GetComponent<ArrowProjectile>();
 
             if (proj == null)
             {

@@ -8,7 +8,7 @@ public partial class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager instance;
     public Player.PlayerCharacter CharacterInUse;
-    public List<SkillUpgrade> AvailableUpgrades { get; private set; }
+    public List<StatUpgrade> AvailableUpgrades { get; private set; }
 
     [SerializeField] private int _numButtons;
     [SerializeField] private List<UpgradeButton> _upgradeButtons; // (3) buttons for selecting upgrades.
@@ -42,7 +42,7 @@ public partial class UpgradeManager : MonoBehaviour
         _upgradeButtonTemplate =
             _upgradePanel.transform.Find("UpgradeButtonContainer/UpgradeButtonTemplate").gameObject;
 
-        AvailableUpgrades = new List<SkillUpgrade>();
+        AvailableUpgrades = new List<StatUpgrade>();
 
         Transform buttonContainer = _upgradeButtonTemplate.transform.parent;
 
@@ -70,7 +70,7 @@ public partial class UpgradeManager : MonoBehaviour
         // Load contents from each folder into a list
 
         var generalUpgrades =
-            Resources.LoadAll<SkillUpgrade>("Scripts/Upgrade System/ScriptableObjects/General");
+            Resources.LoadAll<StatUpgrade>("Scripts/Upgrade System/ScriptableObjects/General");
 
         var archerUpgrades =
             Resources.LoadAll<ArcherUpgrade>("Scripts/Upgrade System/ScriptableObjects/Archer");
@@ -78,7 +78,7 @@ public partial class UpgradeManager : MonoBehaviour
             Resources.LoadAll<TankUpgrade>("Scripts/Upgrade System/ScriptableObjects/Tank");
 
         int capacity = generalUpgrades.Length + archerUpgrades.Length + tankUpgrades.Length;
-        List<SkillUpgrade> upgrades = new List<SkillUpgrade>(capacity);
+        List<StatUpgrade> upgrades = new List<StatUpgrade>(capacity);
 
         // Add each array to the list
         upgrades.AddRange(generalUpgrades);
@@ -122,7 +122,7 @@ public partial class UpgradeManager : MonoBehaviour
             // if the character in use can "use" the upgrade
             switch (upgrade)
             {
-                // If it's null, the scriptableObject found was not of type SkillUpgrade,
+                // If it's null, the scriptableObject found was not of type StatUpgrade,
                 // continue
                 case null:
                     Debug.LogError("HOLD ON! THIS SHOULD NEVER HAPPEN. TELL VILLE");
@@ -151,13 +151,13 @@ public partial class UpgradeManager : MonoBehaviour
     }
 
     // Pop: get and remove from list
-    public SkillUpgrade[] PopRandomSuitableUpgrades(int count)
+    public StatUpgrade[] PopRandomSuitableUpgrades(int count)
     {
         int index = 0;
-        SkillUpgrade[] randomUpgrades = new SkillUpgrade[count];
+        StatUpgrade[] randomUpgrades = new StatUpgrade[count];
 
         if (AvailableUpgrades.Count == 0)
-            return new SkillUpgrade[0];
+            return new StatUpgrade[0];
 
         if (count > AvailableUpgrades.Count)
             count = AvailableUpgrades.Count;

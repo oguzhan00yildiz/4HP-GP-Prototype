@@ -8,40 +8,6 @@ namespace Global
     {
         [SerializeField] private Slider _waveProgressSlider;
         [SerializeField] private GameObject _upgradeScreen;
-        private float progressBarTransitionDuration = 0.2f;
-
-        #region Singleton
-        private static CanvasManager _instance;
-        public static CanvasManager Instance
-        {
-            get
-            {
-                if (_instance != null)
-                    return _instance;
-                _instance = FindObjectOfType<CanvasManager>();
-
-                if (_instance != null)
-                    return _instance;
-                var obj = new GameObject("CanvasManager");
-                _instance = obj.AddComponent<CanvasManager>();
-
-                return _instance;
-            }
-        }
-        #endregion
-
-        private void OnEnable()
-        {
-            if (_instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-            }
-            else
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-        }
 
         public void UpdateProgress(float newProgress)
         {
@@ -52,10 +18,11 @@ namespace Global
         private IEnumerator UpdateProgressBar(float initialValue, float targetValue)
         {
             var elapsedTime = 0f;
+            var duration = Const.Effects.PROGRESS_BAR_TRANSITION_DURATION;
 
-            while (elapsedTime < progressBarTransitionDuration)
+            while (elapsedTime < duration)
             {
-                _waveProgressSlider.value = Mathf.Lerp(initialValue, targetValue, elapsedTime / progressBarTransitionDuration);
+                _waveProgressSlider.value = Mathf.Lerp(initialValue, targetValue, elapsedTime / duration);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
@@ -68,9 +35,9 @@ namespace Global
             UpdateProgress(0);
         }
 
-        public void OnWaveCompleted()
+        public void ShowWaveCompletionScreen()
         {
-            UpgradeManager.instance.ShowUpgradePanel();
+            GameManager.Upgrades.ShowUpgradePanel();
         }
 
     }

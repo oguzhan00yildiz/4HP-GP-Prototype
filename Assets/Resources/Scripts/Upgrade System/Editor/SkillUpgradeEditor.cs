@@ -1,6 +1,6 @@
 using UnityEditor;
 
-[CustomEditor(typeof(SkillUpgrade))]
+[CustomEditor(typeof(StatUpgrade))]
 public class SkillUpgradeEditor : Editor
 {
 
@@ -38,22 +38,22 @@ public class SkillUpgradeEditor : Editor
 
         EditorGUILayout.PropertyField(selectedTypeProp);
 
-        SkillUpgrade.UpgradeType typeSelection = (SkillUpgrade.UpgradeType)selectedTypeProp.enumValueIndex;
+        StatUpgrade.UpgradeType typeSelection = (StatUpgrade.UpgradeType)selectedTypeProp.enumValueIndex;
 
         EditorGUILayout.Space();
 
         switch (typeSelection)
         {
-            case SkillUpgrade.UpgradeType.General:
+            case StatUpgrade.UpgradeType.General:
                 EditorGUILayout.LabelField("General Upgrade");
                 break;
-            case SkillUpgrade.UpgradeType.Ranged:
+            case StatUpgrade.UpgradeType.Ranged:
                 EditorGUILayout.LabelField("Ranged Upgrade");
                 break;
-            case SkillUpgrade.UpgradeType.Melee:
+            case StatUpgrade.UpgradeType.Melee:
                 EditorGUILayout.LabelField("Melee Upgrade");
                 break;
-            case SkillUpgrade.UpgradeType.Magic:
+            case StatUpgrade.UpgradeType.Magic:
                 EditorGUILayout.LabelField("Magic Upgrade");
                 break;
         }

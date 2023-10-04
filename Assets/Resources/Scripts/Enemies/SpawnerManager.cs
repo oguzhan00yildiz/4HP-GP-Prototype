@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Global;
 using UnityEngine;
 
 namespace Enemies
@@ -92,7 +93,7 @@ namespace Enemies
         // Creates the list of enemies that then are going to be spawned according to current wave and budget
         private void GenerateEnemies()
         {
-            Global.CanvasManager.Instance.ResetProgressBar();
+            GameManager.Canvas.ResetProgressBar();
             _enemiesToSpawn.Clear();
 
             // LINQ expression to creates a list of all the unlocked enemies given the current wave

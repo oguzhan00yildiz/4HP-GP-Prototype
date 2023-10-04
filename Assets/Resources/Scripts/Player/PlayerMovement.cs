@@ -1,9 +1,11 @@
+using Global;
 using UnityEngine;
 
 namespace PlayerLogic
 {
     public class PlayerMovement : MonoBehaviour
     {
+        public float WalkSpeed;
         private Vector2 _nextMovement;
         private Rigidbody2D _rb;
 
@@ -60,7 +62,7 @@ namespace PlayerLogic
                 + screenUp * input.y).normalized;
 
             // Multiply movement vector by walk speed
-            screenMovement *= Const.Player.WALK_SPEED;
+            screenMovement *= WalkSpeed;
 
             // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
             bool moving = input.magnitude > 0;
@@ -115,7 +117,7 @@ namespace PlayerLogic
             _modelRenderer.flipX = left;
 
             // Flip player attack origin when facing left
-            Player.instance.AttackHandler.AttackOrigin.localScale = new Vector3()
+            GameManager.Player.AttackHandler.AttackOrigin.localScale = new Vector3()
             {
                 x = left ? -1 : 1,
                 y = 1,

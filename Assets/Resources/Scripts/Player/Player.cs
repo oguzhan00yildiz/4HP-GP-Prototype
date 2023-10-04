@@ -1,3 +1,4 @@
+using Global;
 using UnityEngine;
 
 namespace PlayerLogic
@@ -52,20 +53,26 @@ namespace PlayerLogic
             Initialize();
         }
 
-        public void AddUpgrade(SkillUpgrade upgrade)
+        public void AddUpgrade(StatUpgrade upgrade)
         {
             Debug.Log("Added upgrade to player");
 
-            PlayerAttackHandler.instance.ReceiveUpgrade(upgrade);
+            AttackHandler.ReceiveUpgrade(upgrade);
         }
 
         void Initialize()
         {
             Movement = GetComponent<PlayerMovement>();
+            Movement.WalkSpeed = 
+                Character == PlayerCharacter.Tank 
+                    ? Const.Player.STATS_TANK_SPEED
+                    : Const.Player.STATS_ARCHER_SPEED;
+
             AttackHandler = GetComponent<PlayerAttackHandler>();
             Camera = GameObject.FindWithTag("PlayerCamera").GetComponent<Camera>();
             MouseLook = Camera.GetComponent<CameraMouseLook>();
             Canvas = GameObject.FindWithTag("Canvas").GetComponent<Canvas>();
+            
         }
     }
 }
