@@ -12,7 +12,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void Start()
     {
-        _target = FindObjectOfType<PlayerLogic.Player>().transform;
+        _target = GameObject.FindWithTag("Player").transform;
         _rigidbody = GetComponent<Rigidbody2D>();
         if (_rigidbody == null)
         {
@@ -39,13 +39,5 @@ public class EnemyMovement : MonoBehaviour
     {
         Vector3 moveAmount = transform.position + _targetDirection.normalized * _speed * Time.fixedDeltaTime;
         _rigidbody.MovePosition(moveAmount);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.GetComponent<PlayerLogic.Player>())
-        {
-            Destroy(gameObject);
-        }
     }
 }

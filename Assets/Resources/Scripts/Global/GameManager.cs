@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Global
 {
+    [RequireComponent(typeof(SpawnerManager), typeof(UpgradeManager), typeof(ProjectileManager))]
     public class GameManager : MonoBehaviour
     {
         // Public static references
@@ -19,17 +20,18 @@ namespace Global
         public static ProjectileManager Projectiles
             => _instance._projectileManager;
 
-        public static Player Player
+        public static BasePlayer Player
         => _instance._player;
 
-        public static Player.PlayerCharacter PlayerType
-            => _instance._playerType;
+        public static SpawnerManager EnemyManager
+            => _instance._enemyManager;
 
         private CanvasManager _canvasManager;
+        private SpawnerManager _enemyManager;
         private UpgradeManager _upgradeManager;
         private ProjectileManager _projectileManager;
-        private Player _player;
-        private Player.PlayerCharacter _playerType;
+        private BasePlayer _player;
+        [SerializeField] private IPlayer.PlayerCharacter _playerType;
 
         private int _killedEnemies;
         private const float HealthBarTransitionDuration = .1f;
@@ -68,18 +70,59 @@ namespace Global
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
             }
+        }
 
+        private void Start()
+        {
             Initialize();
         }
 
-        private void Initialize()
+        public void Initialize()
         {
-            _popUpTextPrefab = Resources.Load<GameObject>("Prefabs/Effects/PopUpText");
-            _canvasManager = FindObjectOfType<CanvasManager>();
-            _upgradeManager = gameObject.AddComponent<UpgradeManager>();
-            _projectileManager = gameObject.AddComponent<ProjectileManager>();
-            _player = FindObjectOfType<Player>();
+            _player = CreatePlayer(_playerType);
+            _player.Initialize();
 
+            _popUpTextPrefab = Resources.Load<GameObject>("Prefabs/Effects/DamagePopUpParent");
+            _canvasManager = FindObjectOfType<CanvasManager>();
+
+            _upgradeManager = gameObject.GetComponent<UpgradeManager>();
+            _upgradeManager.Initialize();
+
+            _enemyManager = gameObject.GetComponent<SpawnerManager>();
+            _enemyManager.Initialize();
+
+            _projectileManager = gameObject.GetComponent<ProjectileManager>();
+            
+            _playerReady = true;
+        }
+
+        private static BasePlayer CreatePlayer(IPlayer.PlayerCharacter type)
+        {
+            switch (type)
+            {
+                case IPlayer.PlayerCharacter.Archer:
+                    return SpawnArcher();
+                case IPlayer.PlayerCharacter.Tank:
+                    return SpawnTank();
+                default:
+                    throw new System.Exception("Invalid player type");
+            }
+        }
+
+        private static ArcherPlayer SpawnArcher()
+        {
+            var playerPrefab = Resources.Load<GameObject>("Prefabs/Player/ArcherPlayer");
+            var playerObj = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            var player = playerObj.GetComponent<ArcherPlayer>();
+            return player;
+        }
+
+        private static TankPlayer SpawnTank()
+        {
+            var playerPrefab = Resources.Load<GameObject>("Prefabs/Player/TankPlayer");
+            var playerObj = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            var player = playerObj.GetComponent<TankPlayer>();
+            return player;
         }
 
         public void EnemyHit(EnemyData data, int damage)
@@ -118,13 +161,13 @@ namespace Global
             Destroy(data.gameObject);
             _killedEnemies++;
             var progressPercentage = (float)_killedEnemies
-                                     / (SpawnerManager.Instance.TotalNumSpawned != 0
-                                        ? SpawnerManager.Instance.TotalNumSpawned
+                                     / (_enemyManager.TotalNumSpawned != 0
+                                        ? _enemyManager.TotalNumSpawned
                                         : 1);
 
             Canvas.UpdateProgress(progressPercentage);
 
-            if (_killedEnemies < SpawnerManager.Instance.TotalNumSpawned)
+            if (_killedEnemies < _enemyManager.TotalNumSpawned)
             {
                 return;
             }
@@ -140,12 +183,12 @@ namespace Global
         {
             Destroy(enemyKilled);
             _killedEnemies++;
-            var progressPercentage = (float)_killedEnemies / (SpawnerManager.Instance.TotalNumSpawned != 0
-                ? SpawnerManager.Instance.TotalNumSpawned
+            var progressPercentage = (float)_killedEnemies / (_enemyManager.TotalNumSpawned != 0
+                ? _enemyManager.TotalNumSpawned
                 : 1);
             Canvas.UpdateProgress(progressPercentage);
 
-            if (_killedEnemies < SpawnerManager.Instance.TotalNumSpawned)
+            if (_killedEnemies < _enemyManager.TotalNumSpawned)
             {
                 return;
             }
@@ -163,7 +206,7 @@ namespace Global
                 yield return new WaitForSeconds(0.25f);
             }
 
-            SpawnerManager.Instance.StartNextWave();
+            _enemyManager.StartNextWave();
             _playerReady = false;
         }
 

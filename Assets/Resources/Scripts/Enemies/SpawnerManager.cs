@@ -1,6 +1,6 @@
+using Global;
 using System.Collections.Generic;
 using System.Linq;
-using Global;
 using UnityEngine;
 
 namespace Enemies
@@ -22,60 +22,23 @@ namespace Enemies
         private const float EnemiesPerSecond = 2;
         private const int MaxEnemiesPerRound = 50;
 
-        #region Singleton
-        private static SpawnerManager _instance;
-        public static SpawnerManager Instance
+        private bool _initialized;
+
+        public void Initialize()
         {
-            get
-            {
-                if (_instance != null)
-                    return _instance;
-                _instance = FindObjectOfType<SpawnerManager>();
-
-                if (_instance != null)
-                    return _instance;
-                var obj = new GameObject("SpawnerManager");
-                _instance = obj.AddComponent<SpawnerManager>();
-
-                return _instance;
-            }
-        }
-        #endregion
-
-        private void OnEnable()
-        {
-            if (_instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-            }
-            else
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-        }
-
-        void Start()
-        {
-            #region Missing Player Check
-
-            _player = FindObjectOfType<PlayerLogic.Player>().transform;
-
-            if (_player == null)
-            {
-                Debug.LogError("No player found.");
-                enabled = false;
-                return;
-            }
-
-            #endregion
-
             // Generates the first wave
             CalculateWaveBudget();
+
+            _player = GameObject.FindWithTag("Player").transform;
+
+            _initialized = true;
         }
 
         void Update()
         {
+            if (!_initialized)
+                return;
+
             // Checking if we have more enemies to spawn
             if (!(Time.time >= _nextSpawnTime) || _enemiesToSpawn.Count == 0)
                 return;
