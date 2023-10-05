@@ -9,9 +9,9 @@ namespace Enemies
     {
         [HideInInspector] public int currentWave = 1;
 
-        [SerializeField] private List<EnemyData> _enemies = new();
+        private List<Enemy> _enemies = new();
 
-        private List<GameObject> _enemiesToSpawn = new();
+        private List<GameObject> _spawnPool = new();
         private Transform _player;
         private float _nextSpawnTime;
         private int _waveBudget;
@@ -26,11 +26,16 @@ namespace Enemies
 
         public void Initialize()
         {
+            // Loads all the enemies from the resources folder
+            _enemies = new List<Enemy>(Resources.LoadAll<Enemy>("Prefabs/Enemies"));
+
             // Generates the first wave
             CalculateWaveBudget();
 
+            // Finds the player
             _player = GameObject.FindWithTag("Player").transform;
 
+            // All good
             _initialized = true;
         }
 
@@ -40,8 +45,9 @@ namespace Enemies
                 return;
 
             // Checking if we have more enemies to spawn
-            if (!(Time.time >= _nextSpawnTime) || _enemiesToSpawn.Count == 0)
+            if (!(Time.time >= _nextSpawnTime) || _spawnPool.Count == 0)
                 return;
+
             SpawnEnemy();
             _nextSpawnTime = Time.time + (1f / EnemiesPerSecond);
         }
@@ -57,29 +63,42 @@ namespace Enemies
         private void GenerateEnemies()
         {
             GameManager.CanvasManager.ResetProgressBar();
-            _enemiesToSpawn.Clear();
+            _spawnPool.Clear();
 
             // LINQ expression to creates a list of all the unlocked enemies given the current wave
-            var availableEnemies = _enemies.Where(enemy => enemy.unlockingWave <= currentWave && currentWave <= enemy.lastSpawningWave).ToList();
+            var availableEnemies
+                = _enemies.Where(
+                    enemy => enemy.Data.unlockingWave <= currentWave
+                             && currentWave <= enemy.Data.lastSpawningWave).ToList();
 
-            List<GameObject> generatedEnemies = new();
+            List<Enemy> generatedEnemies = new();
             var remainingBudget = _waveBudget;
 
             // Chooses enemies at random from the available ones, until there are no more enemies available or enemies cap reached
-            while (availableEnemies.Count != 0 && _enemiesToSpawn.Count < MaxEnemiesPerRound)
+            while (availableEnemies.Count != 0 && _spawnPool.Count < MaxEnemiesPerRound)
             {
                 var randEnemyId = Random.Range(0, availableEnemies.Count);
-                var randEnemyCost = availableEnemies[randEnemyId].enemyCost;
+                var randEnemyCost = availableEnemies[randEnemyId].Data.enemyCost;
 
                 if (remainingBudget - randEnemyCost > 0)
                 {
-                    // Finds the number of the specific enemy that have already been added to the list and calculates the percentage compared to the whole budget for the wave
-                    var specificEnemyPercentage = ((float)generatedEnemies.FindAll(obj => availableEnemies[randEnemyId].enemyPrefab).Count) / _waveBudget * 100;
+                    // Finds the number of the specific enemy that have already been added
+                    // to the list and calculates the percentage compared to the whole budget for the wave
 
-                    // Check if there are already too many of that enemy in the wave, if not, it adds it to the list, if yes, it deletes it from the available enemies
-                    if (specificEnemyPercentage < availableEnemies[randEnemyId].maxPercentageInWave)
+                    // Read FindAll as "find all the enemies in the list that have the same name as the one we are checking"
+                    // or with SQL terms,
+                    //      "select * (ALL)
+                    //      from availableEnemies
+                    //      where EnemyName = availableEnemies[randEnemyId].EnemyName"
+                    var specificEnemyPercentage
+                        = (float)generatedEnemies.
+                            FindAll(obj => obj.EnemyName == availableEnemies[randEnemyId].EnemyName).Count / _waveBudget * 100;
+
+                    // Check if there are already too many of that enemy in the wave,
+                    // if not, it adds it to the list, if yes, it deletes it from the available enemies
+                    if (specificEnemyPercentage < availableEnemies[randEnemyId].Data.maxPercentageInWave)
                     {
-                        generatedEnemies.Add(availableEnemies[randEnemyId].enemyPrefab);
+                        generatedEnemies.Add(availableEnemies[randEnemyId]);
                         remainingBudget -= randEnemyCost;
                     }
                     else
@@ -89,7 +108,12 @@ namespace Enemies
                     availableEnemies.Remove(availableEnemies[randEnemyId]);
             }
 
-            _enemiesToSpawn = generatedEnemies;
+            // The old way stored a prefab in each enemydata, this new way
+            // "makes a prefab" from the enemy which is a monobehaviour ~= is a gameobject
+            _spawnPool = new List<GameObject>();
+            foreach (Enemy enemy in generatedEnemies)
+                _spawnPool.Add(enemy.gameObject);
+
             _totalEnemySpawned = generatedEnemies.Count;
         }
 
@@ -109,15 +133,13 @@ namespace Enemies
         // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
         private void SpawnEnemy()
         {
-            if (_enemiesToSpawn.Count <= 0)
+            if (_spawnPool.Count <= 0)
                 return;
 
-            // Set enemy health proportionate to the wave
-            _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealth += Mathf.RoundToInt(0.10f * currentWave);
-
             // Spawning the list of enemies that has been generated
-            Instantiate(_enemiesToSpawn[0], PickRandomSpawnPoint(), Quaternion.identity);
-            _enemiesToSpawn.RemoveAt(0);
+            var spawnedEnemy = Instantiate(_spawnPool[0], PickRandomSpawnPoint(), Quaternion.identity);
+            spawnedEnemy.GetComponent<Enemy>().Initialize();
+            _spawnPool.RemoveAt(0);
         }
 
         // Restarts the spawning cycle

@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 8464932696041934991}
   - component: {fileID: 6032717443744514719}
   m_Layer: 6
-  m_Name: Canvas
+  m_Name: WorldCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,8 +188,7 @@ GameObject:
   - component: {fileID: 3812902357676520214}
   - component: {fileID: 7543406497222081080}
   - component: {fileID: -4763829325891062933}
-  - component: {fileID: 3191575645960664552}
-  - component: {fileID: 2448914194805704164}
+  - component: {fileID: 4943902944026386264}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -300,7 +299,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &3191575645960664552
+--- !u!114 &4943902944026386264
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -309,32 +308,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2980317213719450687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae43b2889292ed147b4dd8b5952e9512, type: 3}
+  m_Script: {fileID: 11500000, guid: cf84855974aa12d4aaa847a7cabc2f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 2
-  _rigidbody: {fileID: 0}
---- !u!114 &2448914194805704164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2980317213719450687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce532c50f65f2cd4e81e018199ba4a28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyName: Red Enemy
-  enemyHealth: 12
-  meleeRange: 1
-  enemyCost: 1
-  unlockingWave: 1
-  lastSpawningWave: 2
-  maxPercentageInWave: 100
-  enemyPrefab: {fileID: 2980317213719450687}
-  enemyHealthBar: {fileID: 3956444284323163398}
+  EnemyName: Enemy1
+  Health: 10
+  MoveSpeed: 3
+  AttackSpeed: 1.2
+  AttackRange: 0.7
+  Damage: 1
+  Data:
+    enemyCost: 2
+    unlockingWave: 1
+    lastSpawningWave: 10
+    maxPercentageInWave: 65
 --- !u!1 &3084814958264213526
 GameObject:
   m_ObjectHideFlags: 0
@@ -346,7 +333,7 @@ GameObject:
   - component: {fileID: 1009855196530015919}
   - component: {fileID: 3956444284323163398}
   m_Layer: 6
-  m_Name: HP Bar
+  m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,7 +9,7 @@ public static class Const
 
         public const float STATS_TANK_HEALTH = 120.0f;
         public const float STATS_TANK_SPEED = 5.0f;
-        public const float STATS_TANK_ATTACK_SPEED = 0.8f;
+        public const float STATS_TANK_ATTACK_SPEED = 2.1f;
         public const float STATS_TANK_ATTACK_DAMAGE = 8.0f;
         public const float STATS_TANK_CRIT_CHANCE = 0.0f;
         public const float STATS_TANK_CRIT_DAMAGE = 0.0f;
@@ -17,7 +17,7 @@ public static class Const
 
         public const float STATS_ARCHER_HEALTH = 100.0f;
         public const float STATS_ARCHER_SPEED = 6.0f;
-        public const float STATS_ARCHER_ATTACK_SPEED = 1.2f;
+        public const float STATS_ARCHER_ATTACK_SPEED = 1.6f;
         public const float STATS_ARCHER_ATTACK_DAMAGE = 10.0f;
         public const float STATS_ARCHER_CRIT_CHANCE = 0.0f;
         public const float STATS_ARCHER_CRIT_DAMAGE = 0.0f;

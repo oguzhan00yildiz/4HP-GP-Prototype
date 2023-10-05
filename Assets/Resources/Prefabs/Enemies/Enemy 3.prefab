@@ -86,8 +86,7 @@ GameObject:
   - component: {fileID: 3812902357676520214}
   - component: {fileID: 7543406497222081080}
   - component: {fileID: -4763829325891062933}
-  - component: {fileID: 3191575645960664552}
-  - component: {fileID: 8680879829084787831}
+  - component: {fileID: -2923915704107760106}
   m_Layer: 6
   m_Name: Enemy 3
   m_TagString: Enemy
@@ -198,7 +197,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &3191575645960664552
+--- !u!114 &-2923915704107760106
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -207,32 +206,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2980317213719450687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae43b2889292ed147b4dd8b5952e9512, type: 3}
+  m_Script: {fileID: 11500000, guid: cf84855974aa12d4aaa847a7cabc2f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 4
-  _rigidbody: {fileID: 0}
---- !u!114 &8680879829084787831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2980317213719450687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce532c50f65f2cd4e81e018199ba4a28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyName: Green Enemy
-  enemyHealth: 25
-  meleeRange: 1
-  enemyCost: 3
-  unlockingWave: 3
-  lastSpawningWave: 10
-  maxPercentageInWave: 15
-  enemyPrefab: {fileID: 2980317213719450687}
-  enemyHealthBar: {fileID: 1035906670830047348}
+  EnemyName: Enemy3
+  Health: 27
+  MoveSpeed: 4.2
+  AttackSpeed: 1.5
+  AttackRange: 1.4
+  Damage: 4
+  Data:
+    enemyCost: 7
+    unlockingWave: 3
+    lastSpawningWave: 10
+    maxPercentageInWave: 15
 --- !u!1 &5874443908144598415
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,7 +269,7 @@ GameObject:
   - component: {fileID: 8559243552330993662}
   - component: {fileID: 1577844666744329128}
   m_Layer: 6
-  m_Name: Canvas
+  m_Name: WorldCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -353,7 +340,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &1577844666744329128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,7 +369,7 @@ GameObject:
   - component: {fileID: 5054251121468101346}
   - component: {fileID: 1035906670830047348}
   m_Layer: 6
-  m_Name: HP Bar
+  m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

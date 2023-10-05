@@ -169,7 +169,7 @@ namespace PlayerLogic
                 // Get damage from stats
                 var damage = Stats.GetTotalStat(StatUpgrade.Stat.AttackDamage);
 
-                GameManager.Instance.EnemyHit(col.gameObject, Mathf.RoundToInt(damage));
+                GameManager.Instance.EnemyHitWithKnockback(col.gameObject, Mathf.RoundToInt(damage), transform.position, damage * damage);
             }
         }
 

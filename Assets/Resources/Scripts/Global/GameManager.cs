@@ -37,7 +37,6 @@ namespace Global
         [SerializeField] private Texture2D cursorTexture;
 
         private int _killedEnemies;
-        private const float HealthBarTransitionDuration = .1f;
         private bool _playerReady;
 
         private static GameObject _popUpTextPrefab;
@@ -162,32 +161,51 @@ namespace Global
             _player.TakeDamage(damage);
         }
 
-        public void EnemyHit(EnemyData data, int damage)
+        public void EnemyHitWithKnockback(GameObject enemyObject, int damage, Vector2 source, float knockback)
         {
-            DisplayDamageNumber(data.transform.position, damage);
+            var enemy = enemyObject.GetComponent<Enemy>();
+            if (enemy == null)
+                return;
 
-            var initialHealth = data.enemyHealth;
-            var remainingHealth = data.enemyHealth -= damage;
+            enemy.TakeDamage(damage, source, knockback);
 
-            StartCoroutine(UpdateEnemyHealthBar(data, initialHealth, remainingHealth));
-
-            if (remainingHealth <= 0)
+            if (enemy.Health <= 0)
             {
-                KillEnemy(data.gameObject);
+                KillEnemy(enemy);
+            }
+        }
+
+        public void EnemyHitWithKnockback(Enemy enemy, int damage, Vector2 source, float knockback)
+        {
+            enemy.TakeDamage(damage, source, knockback);
+
+            if (enemy.Health <= 0)
+            {
+                KillEnemy(enemy);
+            }
+        }
+
+        public void EnemyHit(Enemy enemy, int damage)
+        {
+            enemy.TakeDamage(damage);
+
+            if (enemy.Health <= 0)
+            {
+                KillEnemy(enemy.gameObject);
             }
         }
 
         // Deals damage to the enemy hit
         public void EnemyHit(GameObject enemyGameObject, int damage)
         {
-            EnemyData data = enemyGameObject.GetComponent<EnemyData>();
+            Enemy enemy = enemyGameObject.GetComponent<Enemy>();
 
-            EnemyHit(data, damage);
+            EnemyHit(enemy, damage);
         }
 
-        private void KillEnemy(EnemyData data)
+        private void KillEnemy(Enemy enemy)
         {
-            Destroy(data.gameObject);
+            Destroy(enemy.gameObject);
             _killedEnemies++;
             var progressPercentage = (float)_killedEnemies
                                      / (_enemyManager.TotalNumSpawned != 0
@@ -208,9 +226,9 @@ namespace Global
         }
 
         // Kills the enemy
-        private void KillEnemy(GameObject enemyKilled)
+        private void KillEnemy(GameObject enemyGameObject)
         {
-            Destroy(enemyKilled);
+            Destroy(enemyGameObject);
             _killedEnemies++;
             var progressPercentage = (float)_killedEnemies / (_enemyManager.TotalNumSpawned != 0
                 ? _enemyManager.TotalNumSpawned
@@ -245,20 +263,6 @@ namespace Global
             _playerReady = true;
         }
 
-        // Updates the health bar to the new value with a smooth animation
-        private static IEnumerator UpdateEnemyHealthBar(EnemyData enemy, int initialHealth, float targetHealth)
-        {
-            var elapsedTime = 0f;
-
-            while (elapsedTime < HealthBarTransitionDuration)
-            {
-                enemy.enemyHealthBar.value = Mathf.Lerp(initialHealth, targetHealth, elapsedTime / HealthBarTransitionDuration);
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-
-            enemy.enemyHealthBar.value = targetHealth;
-        }
         private void DisplayDamageNumber(Vector2 origin, int damageAmount)
         {
             float minX = Const.Effects.POPUP_MIN_X_OFFSET;
