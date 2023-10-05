@@ -1,38 +1,37 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace PlayerLogic
 {
     public sealed class ArcherPlayer : BasePlayer
     {
-        private ArcherStats _stats
+        private ArcherStats Stats
         {
-            get { return (ArcherStats)StatInfo; }
-            set { StatInfo = value; }
+            get => (ArcherStats)StatInfo;
+            set => StatInfo = value;
         }
 
         private float MoveSpeed
-            => _stats.GetTotalStat(StatUpgrade.Stat.MoveSpeed);
+            => Stats.GetTotalStat(StatUpgrade.Stat.MoveSpeed);
 
         private float MeleeRange
-            => _stats.GetTotalStat(StatUpgrade.Stat.MeleeRange);
+            => Stats.GetTotalStat(StatUpgrade.Stat.MeleeRange);
+
+        private float AttackSpeed
+            => Stats.GetTotalStat(StatUpgrade.Stat.AttackSpeed);
 
         private float AttackDelay
-            => _stats.GetTotalStat(StatUpgrade.Stat.AttackSpeed);
+            => 1.0f / AttackSpeed;
 
         private static GameObject _arrowCache;
 
         public override IPlayer.PlayerCharacter Character
         {
-            get { return IPlayer.PlayerCharacter.Archer; }
+            get => IPlayer.PlayerCharacter.Archer;
             protected set { }
         }
 
         public override Animator Animator { get; protected set; }
-
-        public override void DamageEffect()
-        {
-            Debug.Log("Player took damage");
-        }
 
         public override void ReceiveUpgrade(StatUpgrade upgrade)
         {
@@ -45,7 +44,7 @@ namespace PlayerLogic
             }
             else
             {
-                _stats.AddUpgrade(upgrade);
+                Stats.AddUpgrade(upgrade);
             }
         }
 
@@ -57,8 +56,8 @@ namespace PlayerLogic
 
         public override void Initialize()
         {
-            _stats = new ArcherStats();
-            Health = _stats.GetInitialStat(StatUpgrade.Stat.MaxHealth);
+            Stats = new ArcherStats();
+            Health = Stats.GetInitialStat(StatUpgrade.Stat.MaxHealth);
 
             if ((CameraController = FindObjectOfType<CameraController>()) == null)
             {
@@ -85,6 +84,12 @@ namespace PlayerLogic
 
             PlayerAnim = Model.GetComponentInChildren<Animator>();
 
+            HealthBar = transform.Find("WorldCanvas/HealthBar").GetComponent<Slider>();
+
+            HealthBar.gameObject.SetActive(false);
+
+            DamagePopUpPrefab = Resources.Load<GameObject>("Prefabs/Player/DamagePopUp");
+
             Initialized = true;
         }
 
@@ -97,6 +102,8 @@ namespace PlayerLogic
             Attack();
 
             UpdateMovement(MoveSpeed);
+
+            FramesSinceLastDamage++;
         }
 
         public override void FixedUpdate()
@@ -129,7 +136,7 @@ namespace PlayerLogic
             }
 
             // If we attacked too short a duration ago, return (do not proceed)
-            if (timeSinceLastAttack < _stats.GetTotalStat(StatUpgrade.Stat.AttackSpeed))
+            if (timeSinceLastAttack < AttackDelay)
                 return;
 
             TimeAtLastAttack = Time.time;

@@ -1,3 +1,4 @@
+using Global;
 using UnityEngine;
 
 public class ProjectileManager : MonoBehaviour
@@ -34,7 +35,7 @@ public class ProjectileManager : MonoBehaviour
 
         ArrowProjectile proj = projectileObj.GetComponent<ArrowProjectile>();
 
-        if (proj == null)
+        if (proj == null && GameManager.DebugMode)
         {
             Debug.LogError($"Projectile {projectileObj.name} doesn't have an ArrowProjectile component!", projectileObj);
             return;
@@ -50,7 +51,7 @@ public class ProjectileManager : MonoBehaviour
 
         ArrowProjectile proj = projectileObj.GetComponent<ArrowProjectile>();
 
-        if (proj == null)
+        if (proj == null && GameManager.DebugMode)
         {
             Debug.LogError($"Projectile {projectileObj.name} doesn't have an ArrowProjectile component!", projectileObj);
             return;
@@ -67,7 +68,7 @@ public class ProjectileManager : MonoBehaviour
 
         Projectile proj = projectileObj.GetComponent<Projectile>();
 
-        if (proj == null)
+        if (proj == null && GameManager.DebugMode)
         {
             Debug.LogError($"Projectile {projectileObj.name} doesn't have a Projectile component!", projectileObj);
             return;

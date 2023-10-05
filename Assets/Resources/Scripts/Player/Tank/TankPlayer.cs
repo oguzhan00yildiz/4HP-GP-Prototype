@@ -1,5 +1,6 @@
 ﻿using Global;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PlayerLogic
 {
@@ -7,13 +8,13 @@ namespace PlayerLogic
     {
         private TankStats Stats
         {
-            get { return (TankStats)StatInfo; }
-            set { StatInfo = value; }
+            get => (TankStats)StatInfo;
+            set => StatInfo = value;
         }
 
         public override IPlayer.PlayerCharacter Character
         {
-            get { return IPlayer.PlayerCharacter.Tank; }
+            get => IPlayer.PlayerCharacter.Tank;
             protected set { }
         }
 
@@ -26,8 +27,11 @@ namespace PlayerLogic
         private float MeleeRange
             => Stats.GetTotalStat(StatUpgrade.Stat.MeleeRange);
 
-        private float AttackDelay
+        private float AttackSpeed
             => Stats.GetTotalStat(StatUpgrade.Stat.AttackSpeed);
+
+        private float AttackDelay
+            => 1.0f / AttackSpeed;
 
         public override Animator Animator { get; protected set; }
 
@@ -61,13 +65,15 @@ namespace PlayerLogic
 
             ModelRenderer = Model.GetComponentInChildren<SpriteRenderer>();
 
+            HealthBar = transform.Find("WorldCanvas/HealthBar").GetComponent<Slider>();
+
+            HealthBar.gameObject.SetActive(false);
+
+            DamagePopUpPrefab = Resources.Load<GameObject>("Prefabs/Player/DamagePopUp");
+
             PlayerAnim = Model.GetComponentInChildren<Animator>();
 
             Initialized = true;
-        }
-        public override void DamageEffect()
-        {
-            Debug.Log("Player took damage");
         }
 
         public override void Attack()
@@ -100,6 +106,8 @@ namespace PlayerLogic
             Attack();
 
             UpdateMovement(MoveSpeed);
+
+            FramesSinceLastDamage++;
         }
         public override void FixedUpdate()
         {

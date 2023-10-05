@@ -328,6 +328,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyName: Red Enemy
   enemyHealth: 12
+  meleeRange: 1
   enemyCost: 1
   unlockingWave: 1
   lastSpawningWave: 2

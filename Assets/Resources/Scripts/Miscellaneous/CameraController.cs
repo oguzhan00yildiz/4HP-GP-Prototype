@@ -43,7 +43,7 @@ public class CameraController : MonoBehaviour
         MouseScreenPosition = targetPos.normalized;
 
         // Convert to 3D position and find original Z offset
-        Vector3 targetPos3d = (Vector3)targetPos;
+        Vector3 targetPos3d = targetPos;
         targetPos3d.z = transform.position.z;
 
         // Set position

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,18 +18,18 @@ public partial class UpgradeManager
         private TMP_Text _uiFlavorText;
         public bool enabled
         {
-            get { return _uiButton.enabled; }
-            set { _uiButton.enabled = value; }
+            get => _uiButton.enabled;
+            set => _uiButton.enabled = value;
         }
         public Button.ButtonClickedEvent onClick
         {
-            get { return _uiButton.onClick; }
-            set { _uiButton.onClick = value; }
+            get => _uiButton.onClick;
+            set => _uiButton.onClick = value;
         }
         public bool interactable
         {
-            get { return _uiButton.interactable; }
-            set { _uiButton.interactable = value; }
+            get => _uiButton.interactable;
+            set => _uiButton.interactable = value;
         }
 
         public UpgradeButton(GameObject buttonObj)
@@ -50,7 +51,7 @@ public partial class UpgradeManager
             _uiButton.gameObject.SetActive(value);
         }
 
-        public void SetInfoFromUpgrade(StatUpgrade upgrade)
+        public void SetInfoFromUpgrade([NotNull] StatUpgrade upgrade)
         {
             // Store upgrade in this button.
             Upgrade = upgrade;
@@ -64,157 +65,60 @@ public partial class UpgradeManager
 
             // Format information to display in the info,
             // based on the upgrade's stat changes.
-
-            // Tank-specific info.
-            if (upgrade is TankUpgrade)
+            
+            foreach (var statChange in upgrade.StatChanges)
             {
-                var tUpgrade = (TankUpgrade)upgrade;
+                // No difference to display.
+                if (statChange.Difference == 0)
+                    continue;
 
-                // General stat changes.
-                var statChanges = tUpgrade.StatChanges;
+                string statName = "";
 
-                foreach (var statChange in statChanges)
+                // Display the effect type in a more readable format.
+                switch (statChange.AffectedStat)
                 {
-                    // Too small of a difference to display.
-                    if (Mathf.Approximately(statChange.Difference, 0))
-                        continue;
-
-                    string statName = "";
-
-                    // Display the effect type in a more readable format.
-                    switch (statChange.AffectedStat)
-                    {
-                        case StatUpgrade.Stat.AttackDamage:
-                            statName = "Damage";
-                            break;
-                        case StatUpgrade.Stat.AttackSpeed:
-                            statName = "Attack Speed";
-                            break;
-                        case StatUpgrade.Stat.MoveSpeed:
-                            statName = "Movement Speed";
-                            break;
-                        case StatUpgrade.Stat.MaxHealth:
-                            statName = "Health";
-                            break;
-                        case StatUpgrade.Stat.CritDamage:
-                            statName = "Critical Damage";
-                            break;
-                        case StatUpgrade.Stat.CritChance:
-                            statName = "Critical Chance";
-                            break;
-                        case StatUpgrade.Stat.Armor:
-                            statName = "Armor";
-                            break;
-                    }
-
-                    builder.AppendLine(statChange.Difference > 0
-                        ? $"<color=\"green\">+{statChange.Difference}% {statName}"
-                        : $"<color=\"red\">{statChange.Difference}% {statName}");
+                    case StatUpgrade.Stat.AttackDamage:
+                        statName = upgrade switch
+                        {
+                            TankUpgrade => "Melee Damage",
+                            ArcherUpgrade => "Arrow Damage",
+                            not null => "Damage"
+                        };
+                        break;
+                    case StatUpgrade.Stat.AttackSpeed:
+                        statName = upgrade switch
+                        {
+                            TankUpgrade => "Melee Speed",
+                            ArcherUpgrade => "Firing Speed",
+                            not null => "Attack Speed"
+                        };
+                        break;
+                    case StatUpgrade.Stat.MeleeRange:
+                        statName = "Melee Range";
+                        break;
+                    case StatUpgrade.Stat.MoveSpeed:
+                        statName = "Movement Speed";
+                        break;
+                    case StatUpgrade.Stat.MaxHealth:
+                        statName = "Health";
+                        break;
+                    case StatUpgrade.Stat.CritDamage:
+                        statName = "Critical Damage";
+                        break;
+                    case StatUpgrade.Stat.CritChance:
+                        statName = "Critical Chance";
+                        break;
+                    case StatUpgrade.Stat.Armor:
+                        statName = "Armor";
+                        break;
                 }
 
-                _uiInfoText.text = builder.ToString();
-
-                Debug.Log("Tank-specific upgrade info display isn't implemented yet!");
+                builder.AppendLine(statChange.Difference > 0
+                    ? $"<color=\"green\">+{statChange.Difference}% {statName}"
+                    : $"<color=\"red\">{statChange.Difference}% {statName}");
             }
 
-            // Archer-specific info.
-            else if (upgrade is ArcherUpgrade)
-            {
-                var aUpgrade = (ArcherUpgrade)upgrade;
-
-                // General stat changes.
-                var statChanges = aUpgrade.StatChanges;
-
-                foreach (var statChange in statChanges)
-                {
-                    // Too small of a difference to display.
-                    if (Mathf.Approximately(statChange.Difference, 0))
-                        continue;
-
-                    string statName = "";
-
-                    // Display the effect type in a more readable format.
-                    switch (statChange.AffectedStat)
-                    {
-                        case StatUpgrade.Stat.AttackDamage:
-                            statName = "Damage";
-                            break;
-                        case StatUpgrade.Stat.AttackSpeed:
-                            statName = "Attack Speed";
-                            break;
-                        case StatUpgrade.Stat.MoveSpeed:
-                            statName = "Movement Speed";
-                            break;
-                        case StatUpgrade.Stat.MaxHealth:
-                            statName = "Health";
-                            break;
-                        case StatUpgrade.Stat.CritDamage:
-                            statName = "Critical Damage";
-                            break;
-                        case StatUpgrade.Stat.CritChance:
-                            statName = "Critical Chance";
-                            break;
-                        case StatUpgrade.Stat.Armor:
-                            statName = "Armor";
-                            break;
-                    }
-
-                    builder.AppendLine(statChange.Difference > 0
-                        ? $"<color=\"green\">+{statChange.Difference}% {statName}"
-                        : $"<color=\"red\">{statChange.Difference}% {statName}");
-                }
-
-                _uiInfoText.text = builder.ToString();
-
-                Debug.Log("Archer-specific upgrade info display isn't implemented yet!");
-            }
-
-            else
-            {
-                // General stat changes.
-                var statChanges = upgrade.StatChanges;
-
-                foreach (var statChange in statChanges)
-                {
-                    // Too small of a difference to display.
-                    if (Mathf.Approximately(statChange.Difference, 0))
-                        continue;
-
-                    string statName = "";
-
-                    // Display the effect type in a more readable format.
-                    switch (statChange.AffectedStat)
-                    {
-                        case StatUpgrade.Stat.AttackDamage:
-                            statName = "Damage";
-                            break;
-                        case StatUpgrade.Stat.AttackSpeed:
-                            statName = "Attack Speed";
-                            break;
-                        case StatUpgrade.Stat.MoveSpeed:
-                            statName = "Movement Speed";
-                            break;
-                        case StatUpgrade.Stat.MaxHealth:
-                            statName = "Health";
-                            break;
-                        case StatUpgrade.Stat.CritDamage:
-                            statName = "Critical Damage";
-                            break;
-                        case StatUpgrade.Stat.CritChance:
-                            statName = "Critical Chance";
-                            break;
-                        case StatUpgrade.Stat.Armor:
-                            statName = "Armor";
-                            break;
-                    }
-
-                    builder.AppendLine(statChange.Difference > 0
-                        ? $"<color=\"green\">+{statChange.Difference}% {statName}"
-                        : $"<color=\"red\">{statChange.Difference}% {statName}");
-                }
-
-                _uiInfoText.text = builder.ToString();
-            }
+            _uiInfoText.text = builder.ToString();
             _uiFlavorText.text = upgrade.FlavorText;
         }
     }

@@ -6,8 +6,22 @@ namespace Global
 {
     public class CanvasManager : MonoBehaviour
     {
+        public Canvas Canvas { get; private set; }
         [SerializeField] private Slider _waveProgressSlider;
         [SerializeField] private GameObject _upgradeScreen;
+        private DamageScreenEffect _damageScreenEffect;
+
+        private void Awake()
+        {
+            Canvas = GetComponent<Canvas>();
+            _damageScreenEffect = GetComponentInChildren<DamageScreenEffect>();
+            _damageScreenEffect.Initialize();
+        }
+
+        public void DisplayDamageOverlay()
+        {
+            _damageScreenEffect?.ShowDamageFlash(true);
+        }
 
         public void UpdateProgress(float newProgress)
         {

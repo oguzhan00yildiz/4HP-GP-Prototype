@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Global;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace PlayerLogic
 {
@@ -7,11 +10,15 @@ namespace PlayerLogic
     {
         // Public: accessible by any class
         public PlayerStatInfo StatInfo { get; set; }
+        public Vector2 Position
+            => transform.position;
 
         // Protected: only accessible by this class and its children
         protected LayerMask EnemyLayer => LayerMask.GetMask("Enemy");
         protected float Health { get; private protected set; }
-        protected float MoveSpd { get; private protected set; }
+        protected float MaxHealth
+            => StatInfo.GetTotalStat(StatUpgrade.Stat.MaxHealth);
+        protected Slider HealthBar { get; private protected set; }
         protected float TimeAtLastAttack { get; private protected set; }
         protected CameraController CameraController { get; private protected set; }
         protected Transform AttackOrigin { get; private protected set; }
@@ -24,6 +31,9 @@ namespace PlayerLogic
         protected bool Initialized { get; private protected set; }
         protected bool AttackHeld
             => Input.GetButton("Fire1");
+        protected int FramesSinceLastDamage { get; private protected set; }
+
+        protected GameObject DamagePopUpPrefab;
 
         // No constructor needed, since we're using Unity's MonoBehaviour
 
@@ -35,7 +45,7 @@ namespace PlayerLogic
                 Debug.LogError("Player camera prefab is null!");
                 return null;
             }
-            
+
             var camObj = Instantiate(prefab, new Vector3(0, 0, -10), Quaternion.identity);
 
             var cam = camObj.GetComponent<CameraController>();
@@ -46,7 +56,45 @@ namespace PlayerLogic
         // Virtual: can be overridden by children
         public virtual void TakeDamage(int amount)
         {
+            if (FramesSinceLastDamage < Const.Player.INVULNERABILITY_FRAMES)
+                return;
+
+            FramesSinceLastDamage = 0;
+
             Health -= amount;
+            DamageEffect(amount);
+        }
+
+        protected virtual void DamageEffect(int damageAmount)
+        {
+            HealthBar.gameObject.SetActive(true);
+            HealthBar.value = Health / MaxHealth;
+            DisplayDamageNumber(transform.position, damageAmount);
+            GameManager.CanvasManager.DisplayDamageOverlay();
+
+            if (GameManager.DebugMode)
+            {
+                Debug.Log("Player took damage");
+            }
+        }
+
+        protected virtual void UpdateHealthBar()
+        {
+            HealthBar.value = Health / MaxHealth;
+        }
+
+        // Ossi's method
+        protected virtual void DisplayDamageNumber(Vector2 origin, int damageAmount)
+        {
+            float minX = Const.Effects.POPUP_MIN_X_OFFSET;
+            float maxX = Const.Effects.POPUP_MAX_X_OFFSET;
+
+            float rnd = Random.Range(minX, maxX);
+            var newPos = new Vector3(rnd, 0, 0);
+            var popUpObject = Instantiate(DamagePopUpPrefab, origin + (Vector2)newPos, Quaternion.identity);
+            var tmpText = popUpObject.GetComponentInChildren<TextMeshPro>();
+            tmpText.text = damageAmount.ToString();
+            Destroy(popUpObject, .5f);
         }
 
         public virtual void UpdateMovement(float walkSpeed)
@@ -136,7 +184,6 @@ namespace PlayerLogic
         public abstract Animator Animator { get; protected set; }
         public abstract void Initialize();
         public abstract void Attack();
-        public abstract void DamageEffect();
         public abstract void ReceiveUpgrade(StatUpgrade upgrade);
         public abstract void Update();
         public abstract void FixedUpdate();

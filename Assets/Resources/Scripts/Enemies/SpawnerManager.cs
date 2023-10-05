@@ -34,7 +34,7 @@ namespace Enemies
             _initialized = true;
         }
 
-        void Update()
+        private void Update()
         {
             if (!_initialized)
                 return;
@@ -56,7 +56,7 @@ namespace Enemies
         // Creates the list of enemies that then are going to be spawned according to current wave and budget
         private void GenerateEnemies()
         {
-            GameManager.Canvas.ResetProgressBar();
+            GameManager.CanvasManager.ResetProgressBar();
             _enemiesToSpawn.Clear();
 
             // LINQ expression to creates a list of all the unlocked enemies given the current wave
@@ -111,6 +111,9 @@ namespace Enemies
         {
             if (_enemiesToSpawn.Count <= 0)
                 return;
+
+            // Set enemy health proportionate to the wave
+            _enemiesToSpawn[0].GetComponent<EnemyData>().enemyHealth += Mathf.RoundToInt(0.10f * currentWave);
 
             // Spawning the list of enemies that has been generated
             Instantiate(_enemiesToSpawn[0], PickRandomSpawnPoint(), Quaternion.identity);

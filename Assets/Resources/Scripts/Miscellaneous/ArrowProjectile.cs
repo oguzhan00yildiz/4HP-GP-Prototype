@@ -28,7 +28,7 @@ public class ArrowProjectile : Projectile
         int maxLifetimeFrames = 5000;
         int lifeFrames = 0;
 
-        Vector2 direction = Vector2.zero;
+        Vector2 direction;
 
         Transform spriteContainer = transform.Find("SpriteContainer");
 

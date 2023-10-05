@@ -34,7 +34,6 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-
     private void FixedUpdate()
     {
         Vector3 moveAmount = transform.position + _targetDirection.normalized * _speed * Time.fixedDeltaTime;

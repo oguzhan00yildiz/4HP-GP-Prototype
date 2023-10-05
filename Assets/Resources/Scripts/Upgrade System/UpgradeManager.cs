@@ -1,4 +1,3 @@
-using System;
 using Global;
 using PlayerLogic;
 using System.Collections.Generic;
@@ -9,19 +8,21 @@ public partial class UpgradeManager : MonoBehaviour
 {
     public List<StatUpgrade> AvailableUpgrades { get; private set; }
 
-    [SerializeField] private int _numButtons;
-    [SerializeField] private List<UpgradeButton> _upgradeButtons; // (3) buttons for selecting upgrades.
-    [SerializeField] private GameObject _upgradePanel;
+    private int _numButtons;
+    private List<UpgradeButton> _upgradeButtons; // (3) buttons for selecting upgrades.
+    private GameObject _upgradePanel;
 
     private GameObject _upgradeButtonTemplate;
 
     public void Initialize()
     {
-        var canvas = GameObject.FindWithTag("Canvas").GetComponent<Canvas>();
+        var canvas = GameManager.CanvasManager.Canvas;
 
         _upgradePanel = canvas.transform.Find("UpgradeScreen").gameObject;
 
         _upgradeButtons = new List<UpgradeButton>(_numButtons);
+
+        _numButtons = 3;
 
         _upgradeButtonTemplate =
             _upgradePanel.transform.Find("UpgradeButtonContainer/UpgradeButtonTemplate").gameObject;
@@ -65,35 +66,36 @@ public partial class UpgradeManager : MonoBehaviour
         List<StatUpgrade> upgrades = new List<StatUpgrade>(capacity);
 
         // Add each array to the list
-        upgrades.AddRange(generalUpgrades);
-
-        if (generalUpgrades.Length == 0)
+        
+        if (generalUpgrades.Length == 0 && GameManager.DebugMode)
         {
             Debug.LogWarning(
                 "No general upgrades found" +
                 " at Scripts/Upgrade System/ScriptableObjects/General");
         }
+        else
+            upgrades.AddRange(generalUpgrades);
 
-        upgrades.AddRange(archerUpgrades);
-
-        if (archerUpgrades.Length == 0)
+        if (archerUpgrades.Length == 0 && GameManager.DebugMode)
         {
             Debug.LogWarning(
                 "No archer upgrades found" +
                 " at Scripts/Upgrade System/ScriptableObjects/Archer");
         }
+        else
+            upgrades.AddRange(archerUpgrades);
 
-        upgrades.AddRange(tankUpgrades);
-
-        if (tankUpgrades.Length == 0)
+        if (tankUpgrades.Length == 0 && GameManager.DebugMode)
         {
             Debug.LogWarning(
                 "No tank upgrades found" +
                 " at Scripts/Upgrade System/ScriptableObjects/Tank");
         }
+        else
+            upgrades.AddRange(tankUpgrades);
 
         // If the folder in the above path is empty, stop
-        if (upgrades.Count == 0)
+        if (upgrades.Count == 0 && GameManager.DebugMode)
         {
             Debug.LogError("Scripts/Upgrade System/ScriptableObjects is empty! No upgrades available");
             TogglePanel(false);
@@ -119,11 +121,10 @@ public partial class UpgradeManager : MonoBehaviour
                 case ArcherUpgrade when character == IPlayer.PlayerCharacter.Archer:
                     AvailableUpgrades.Add(upgrade);
                     break;
-
-                // Should be a general upgrade, so add to the list.
-                default:
+                // If found a general upgrade, add to the list
+                case StatUpgrade:
                     AvailableUpgrades.Add(upgrade);
-                    continue;
+                    break;
             }
         }
 
@@ -137,7 +138,8 @@ public partial class UpgradeManager : MonoBehaviour
         StatUpgrade[] randomUpgrades = new StatUpgrade[count];
 
         if (AvailableUpgrades.Count == 0)
-            return Array.Empty<StatUpgrade>();
+            // ReSharper disable once UseArrayEmptyMethod
+            return new StatUpgrade[0];
 
         if (count > AvailableUpgrades.Count)
             count = AvailableUpgrades.Count;
@@ -175,7 +177,9 @@ public partial class UpgradeManager : MonoBehaviour
         // If no more available upgrades, don't show panel.
         if (randUpgrades.Length == 0)
         {
-            Debug.LogWarning("No more available upgrades! Not showing upgrade panel.");
+            if(GameManager.DebugMode)
+                Debug.LogWarning("No more available upgrades! Not showing upgrade panel.");
+
             GameManager.Instance.PlayerSetReady();
             return;
         }
@@ -184,6 +188,9 @@ public partial class UpgradeManager : MonoBehaviour
         // and allow interaction.
         for (int i = 0; i < _upgradeButtons.Count; i++)
         {
+            if(i >= randUpgrades.Length)
+                break;
+
             if (randUpgrades[i] == null)
             {
                 _upgradeButtons[i].SetActive(false);

@@ -11,7 +11,9 @@ namespace Global
     {
         // Public static references
         // Use these to access game instance references.
-        public static CanvasManager Canvas
+        public static bool DebugMode
+            => _instance._enableDebug;
+        public static CanvasManager CanvasManager
             => _instance._canvasManager;
 
         public static UpgradeManager Upgrades
@@ -32,12 +34,17 @@ namespace Global
         private ProjectileManager _projectileManager;
         private BasePlayer _player;
         [SerializeField] private IPlayer.PlayerCharacter _playerType;
+        [SerializeField] private Texture2D cursorTexture;
 
         private int _killedEnemies;
         private const float HealthBarTransitionDuration = .1f;
         private bool _playerReady;
 
         private static GameObject _popUpTextPrefab;
+
+        [Header("Debug")]
+        [SerializeField] private bool _enableDebug;
+        [SerializeField] private bool _godMode;
 
         #region Singleton
         private static GameManager _instance;
@@ -79,11 +86,14 @@ namespace Global
 
         public void Initialize()
         {
-            _player = CreatePlayer(_playerType);
-            _player.Initialize();
+            _player = CreatePlayer(_playerType, true);
 
             _popUpTextPrefab = Resources.Load<GameObject>("Prefabs/Effects/DamagePopUpParent");
-            _canvasManager = FindObjectOfType<CanvasManager>();
+
+            if ((_canvasManager = FindObjectOfType<CanvasManager>()) == null)
+            {
+                _canvasManager = CreateGameCanvas();
+            }
 
             _upgradeManager = gameObject.GetComponent<UpgradeManager>();
             _upgradeManager.Initialize();
@@ -92,37 +102,64 @@ namespace Global
             _enemyManager.Initialize();
 
             _projectileManager = gameObject.GetComponent<ProjectileManager>();
-            
-            _playerReady = true;
+
+            SetCursor();
         }
 
-        private static BasePlayer CreatePlayer(IPlayer.PlayerCharacter type)
+        private static BasePlayer CreatePlayer(IPlayer.PlayerCharacter type, bool initialize)
         {
             switch (type)
             {
                 case IPlayer.PlayerCharacter.Archer:
-                    return SpawnArcher();
+                    return SpawnArcher(initialize);
                 case IPlayer.PlayerCharacter.Tank:
-                    return SpawnTank();
+                    return SpawnTank(initialize);
                 default:
                     throw new System.Exception("Invalid player type");
             }
         }
 
-        private static ArcherPlayer SpawnArcher()
+        private static ArcherPlayer SpawnArcher(bool initialize)
         {
             var playerPrefab = Resources.Load<GameObject>("Prefabs/Player/ArcherPlayer");
             var playerObj = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             var player = playerObj.GetComponent<ArcherPlayer>();
+
+            if (initialize)
+            {
+                player.Initialize();
+            }
             return player;
         }
 
-        private static TankPlayer SpawnTank()
+        private static TankPlayer SpawnTank(bool initialize)
         {
             var playerPrefab = Resources.Load<GameObject>("Prefabs/Player/TankPlayer");
             var playerObj = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             var player = playerObj.GetComponent<TankPlayer>();
+            if (initialize)
+            {
+                player.Initialize();
+            }
             return player;
+        }
+
+        private static CanvasManager CreateGameCanvas()
+        {
+            var canvasPrefab = Resources.Load<GameObject>("Prefabs/UI/GameCanvas");
+            var canvasObj = Instantiate(canvasPrefab, Vector3.zero, Quaternion.identity);
+            var canvas = canvasObj.GetComponentInChildren<CanvasManager>();
+            return canvas;
+        }
+
+        public void PlayerHit(int damage)
+        {
+            if (_godMode)
+            {
+                return;
+            }
+
+            _player.TakeDamage(damage);
         }
 
         public void EnemyHit(EnemyData data, int damage)
@@ -143,17 +180,9 @@ namespace Global
         // Deals damage to the enemy hit
         public void EnemyHit(GameObject enemyGameObject, int damage)
         {
-            DisplayDamageNumber(enemyGameObject.transform.position, damage);
-
             EnemyData data = enemyGameObject.GetComponent<EnemyData>();
 
-            var initialHealth = data.enemyHealth;
-            var remainingHealth = data.enemyHealth -= damage;
-
-            StartCoroutine(UpdateEnemyHealthBar(data, initialHealth, remainingHealth));
-
-            if (remainingHealth <= 0)
-            { KillEnemy(enemyGameObject); }
+            EnemyHit(data, damage);
         }
 
         private void KillEnemy(EnemyData data)
@@ -165,7 +194,7 @@ namespace Global
                                         ? _enemyManager.TotalNumSpawned
                                         : 1);
 
-            Canvas.UpdateProgress(progressPercentage);
+            CanvasManager.UpdateProgress(progressPercentage);
 
             if (_killedEnemies < _enemyManager.TotalNumSpawned)
             {
@@ -173,7 +202,7 @@ namespace Global
             }
 
             ClearKilledEnemyCounter();
-            Canvas.ShowWaveCompletionScreen();
+            CanvasManager.ShowWaveCompletionScreen();
             // Start waiting for player to be ready to start next wave
             StartCoroutine(PlayerContinueWaiter());
         }
@@ -186,7 +215,7 @@ namespace Global
             var progressPercentage = (float)_killedEnemies / (_enemyManager.TotalNumSpawned != 0
                 ? _enemyManager.TotalNumSpawned
                 : 1);
-            Canvas.UpdateProgress(progressPercentage);
+            CanvasManager.UpdateProgress(progressPercentage);
 
             if (_killedEnemies < _enemyManager.TotalNumSpawned)
             {
@@ -194,7 +223,7 @@ namespace Global
             }
 
             ClearKilledEnemyCounter();
-            Canvas.ShowWaveCompletionScreen();
+            CanvasManager.ShowWaveCompletionScreen();
             // Start waiting for player to be ready to start next wave
             StartCoroutine(PlayerContinueWaiter());
         }
@@ -246,6 +275,17 @@ namespace Global
         public void ClearKilledEnemyCounter()
         {
             _killedEnemies = 0;
+        }
+
+        private void SetCursor()
+        {
+            if (cursorTexture == null)
+            {
+                Debug.LogError("Cursor texture not set!");
+                return;
+            }
+            var cursorHotSpot = new Vector2(cursorTexture.width / 2, cursorTexture.height / 2);
+            Cursor.SetCursor(cursorTexture, cursorHotSpot, CursorMode.Auto);
         }
     }
 }

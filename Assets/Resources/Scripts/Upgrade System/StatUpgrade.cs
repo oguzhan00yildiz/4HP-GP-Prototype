@@ -13,6 +13,7 @@ public class StatUpgrade : ScriptableObject
         public float Difference;
 
         public readonly float Multiplier => 1.0f + (Difference / 100);
+        //public readonly float Divider => 1.0f - (Difference / 100);
     }
 
     public enum Stat
