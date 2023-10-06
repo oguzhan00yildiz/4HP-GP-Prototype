@@ -275,7 +275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99088c9168c38a549a1459eeb587c621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerType: 1
+  _playerType: 0
   cursorTexture: {fileID: 2800000, guid: c08453099912b5540bd4b6cdd30c1cc0, type: 3}
   _enableDebug: 0
   _godMode: 0

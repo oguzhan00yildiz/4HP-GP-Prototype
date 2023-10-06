@@ -27,7 +27,7 @@ namespace Enemies
         protected Rigidbody2D Rb;
         protected Transform Target;
         protected Vector3 TargetDirection;
-        protected Vector2? _knockbackVector;
+        protected Vector2? KnockbackVector;
 
         private bool _initialized;
         private static GameObject _popUpTextPrefab;
@@ -49,7 +49,7 @@ namespace Enemies
             Vector2 knockback 
                 = ((Vector2)transform.position - (Vector2)damageOrigin).normalized * knockbackAmount;
             
-            _knockbackVector = knockback;
+            KnockbackVector = knockback;
         }
 
         // Updates the health bar to the new value with a smooth animation
@@ -128,10 +128,10 @@ namespace Enemies
             //Vector2 moveAmount = TargetDirection.normalized * MoveSpeed;
 
             // TODO: Fix knockback (too snappy/laggy looking rn)
-            //if (_knockbackVector.HasValue)
+            //if (KnockbackVector.HasValue)
             //{
-            //    moveAmount += _knockbackVector.Value;
-            //    _knockbackVector = null;
+            //    moveAmount += KnockbackVector.Value;
+            //    KnockbackVector = null;
             //}
 
             //Rb.velocity += moveAmount * Time.fixedDeltaTime;
