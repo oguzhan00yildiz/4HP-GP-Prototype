@@ -22,6 +22,35 @@ namespace PlayerLogic
         }
 
         private List<ArcherUpgrade> _archerUpgrades;
+
+        public bool TryGetBurstShotStats(out ArcherUpgrade.BurstShotUpgrade? upgrade)
+        {
+            upgrade = null;
+            foreach (var archerUpgrade in _archerUpgrades)
+            {
+                if (archerUpgrade.GiveBurstShotUpgrade)
+                {
+                    upgrade = archerUpgrade.GivenBurstShotUpgrade;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool TryGetMultiShotStats(out ArcherUpgrade.MultiShotUpgrade? upgrade)
+        {
+            upgrade = null;
+            foreach (var archerUpgrade in _archerUpgrades)
+            {
+                if (archerUpgrade.GiveMultiShotUpgrade)
+                {
+                    upgrade = archerUpgrade.GivenMultiShotUpgrade;
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         public override void AddUpgrade(StatUpgrade upgrade)
         {
             switch (upgrade)

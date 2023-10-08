@@ -27,7 +27,7 @@ namespace Enemies
         protected Rigidbody2D Rb;
         protected Transform Target;
         protected Vector3 TargetDirection;
-        protected Vector2? KnockbackVector;
+        protected Vector2 KnockbackVector;
 
         private bool _initialized;
         private static GameObject _popUpTextPrefab;
@@ -128,11 +128,10 @@ namespace Enemies
             //Vector2 moveAmount = TargetDirection.normalized * MoveSpeed;
 
             // TODO: Fix knockback (too snappy/laggy looking rn)
-            //if (KnockbackVector.HasValue)
-            //{
-            //    moveAmount += KnockbackVector.Value;
-            //    KnockbackVector = null;
-            //}
+            if(KnockbackVector.magnitude > 0.01f)
+                moveAmount += KnockbackVector * Time.fixedDeltaTime;
+
+            KnockbackVector = Vector2.Lerp(KnockbackVector, Vector2.zero, 5f * Time.fixedDeltaTime);
 
             //Rb.velocity += moveAmount * Time.fixedDeltaTime;
             Rb.MovePosition(moveAmount);

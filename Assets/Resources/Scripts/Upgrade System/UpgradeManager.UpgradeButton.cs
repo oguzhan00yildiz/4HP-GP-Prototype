@@ -111,6 +111,9 @@ public partial class UpgradeManager
                     case StatUpgrade.Stat.Armor:
                         statName = "Armor";
                         break;
+                    case StatUpgrade.Stat.Knockback:
+                        statName = "Knockback";
+                        break;
                 }
 
                 builder.AppendLine(statChange.Difference > 0

@@ -33,6 +33,9 @@ namespace PlayerLogic
         private float AttackDelay
             => 1.0f / AttackSpeed;
 
+        private float KnockbackForce
+            => Stats.GetTotalStat(StatUpgrade.Stat.Knockback);
+
         public override Animator Animator { get; protected set; }
 
         public override void Initialize()
@@ -169,7 +172,7 @@ namespace PlayerLogic
                 // Get damage from stats
                 var damage = Stats.GetTotalStat(StatUpgrade.Stat.AttackDamage);
 
-                GameManager.Instance.EnemyHitWithKnockback(col.gameObject, Mathf.RoundToInt(damage), transform.position, damage * damage);
+                GameManager.Instance.EnemyHitWithKnockback(col.gameObject, Mathf.RoundToInt(damage), transform.position, KnockbackForce);
             }
         }
 

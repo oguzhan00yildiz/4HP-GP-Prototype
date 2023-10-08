@@ -9,6 +9,17 @@ namespace PlayerLogic
     public abstract class BasePlayer : MonoBehaviour, IPlayer
     {
         // Public: accessible by any class
+        public bool TryCrit(out float critDamage)
+        {
+            critDamage = 0;
+            if (Random.Range(0, 100) < StatInfo.GetTotalStat(StatUpgrade.Stat.CritChance))
+            {
+                critDamage = StatInfo.GetTotalStat(StatUpgrade.Stat.CritDamage);
+                return true;
+            }
+            return false;
+        }
+
         public PlayerStatInfo StatInfo { get; set; }
         public Vector2 Position
             => transform.position;

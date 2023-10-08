@@ -6,14 +6,16 @@ public class ArcherUpgrade : StatUpgrade
     [System.Serializable]
     public struct MultiShotUpgrade
     {
-        public int Arrows;
+        public int ArrowCount;
         public float DisperseAngle;
+        public float FireDelay;
     }
 
     [System.Serializable]
     public struct BurstShotUpgrade
     {
         public int ArrowCount;
+        public float FireDelay;
         public float BurstDelay;
     }
 

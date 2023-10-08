@@ -14,6 +14,7 @@ public static class Const
         public const float STATS_TANK_CRIT_CHANCE = 0.0f;
         public const float STATS_TANK_CRIT_DAMAGE = 0.0f;
         public const float STATS_TANK_ARMOR = 0.0f;
+        public const float STATS_TANK_KNOCKBACK = 2.0f;
 
         public const float STATS_ARCHER_HEALTH = 100.0f;
         public const float STATS_ARCHER_SPEED = 6.0f;

@@ -25,6 +25,7 @@ public class StatUpgrade : ScriptableObject
         MaxHealth,
         CritDamage,
         CritChance,
+        Knockback,
         Armor
     }
 

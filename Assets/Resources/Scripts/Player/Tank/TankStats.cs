@@ -18,11 +18,41 @@ namespace PlayerLogic
                     { StatUpgrade.Stat.MaxHealth, Const.Player.STATS_TANK_HEALTH },
                     { StatUpgrade.Stat.MoveSpeed, Const.Player.STATS_TANK_SPEED },
                     { StatUpgrade.Stat.Armor, Const.Player.STATS_TANK_ARMOR },
-                    { StatUpgrade.Stat.MeleeRange, Const.Player.MELEE_INITIAL_RANGE }
+                    { StatUpgrade.Stat.MeleeRange, Const.Player.MELEE_INITIAL_RANGE },
+                    { StatUpgrade.Stat.Knockback, Const.Player.STATS_TANK_KNOCKBACK }
                 };
         }
 
         private List<TankUpgrade> _tankUpgrades;
+
+        public bool TryGetShieldStats(out TankUpgrade.ShieldUpgrade? upgrade)
+        {
+            upgrade = null;
+            foreach (var tankUpgrade in _tankUpgrades)
+            {
+                if (tankUpgrade.GiveShieldUpgrade)
+                {
+                    upgrade = tankUpgrade.GivenShieldUpgrade;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool TryGetSpearStats(out TankUpgrade.SpearUpgrade? upgrade)
+        {
+            upgrade = null;
+            foreach (var tankUpgrade in _tankUpgrades)
+            {
+                if (tankUpgrade.GiveSpearUpgrade)
+                {
+                    upgrade = tankUpgrade.GivenSpearUpgrade;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public override void AddUpgrade(StatUpgrade upgrade)
         {
             switch (upgrade)
