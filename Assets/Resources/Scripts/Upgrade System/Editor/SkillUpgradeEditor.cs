@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(SkillUpgrade))]
+[CustomEditor(typeof(StatUpgrade))]
 public class SkillUpgradeEditor : Editor
 {
 
@@ -20,7 +17,7 @@ public class SkillUpgradeEditor : Editor
 
     private void OnEnable()
     {
-        // Find "Type" dropdown (enum) property
+        // Find "AffectedStat" dropdown (enum) property
         selectedTypeProp = serializedObject.FindProperty("TypeOfUpgrade");
         spriteProp = serializedObject.FindProperty("UpgradeIcon");
         nameProp = serializedObject.FindProperty("UpgradeName");
@@ -34,27 +31,29 @@ public class SkillUpgradeEditor : Editor
     }
     public override void OnInspectorGUI()
     {
+        base.OnInspectorGUI();
+        /*
         // Update the actual scriptable object for us to display
         serializedObject.Update();
 
         EditorGUILayout.PropertyField(selectedTypeProp);
 
-        SkillUpgrade.UpgradeType typeSelection = (SkillUpgrade.UpgradeType)selectedTypeProp.enumValueIndex;
+        StatUpgrade.UpgradeType typeSelection = (StatUpgrade.UpgradeType)selectedTypeProp.enumValueIndex;
 
         EditorGUILayout.Space();
 
         switch (typeSelection)
         {
-            case SkillUpgrade.UpgradeType.General:
+            case StatUpgrade.UpgradeType.General:
                 EditorGUILayout.LabelField("General Upgrade");
                 break;
-            case SkillUpgrade.UpgradeType.Ranged:
+            case StatUpgrade.UpgradeType.Ranged:
                 EditorGUILayout.LabelField("Ranged Upgrade");
                 break;
-            case SkillUpgrade.UpgradeType.Melee:
+            case StatUpgrade.UpgradeType.Melee:
                 EditorGUILayout.LabelField("Melee Upgrade");
                 break;
-            case SkillUpgrade.UpgradeType.Magic:
+            case StatUpgrade.UpgradeType.Magic:
                 EditorGUILayout.LabelField("Magic Upgrade");
                 break;
         }
@@ -62,5 +61,6 @@ public class SkillUpgradeEditor : Editor
         base.OnInspectorGUI();
 
         serializedObject.ApplyModifiedProperties();
+        */
     }
 }

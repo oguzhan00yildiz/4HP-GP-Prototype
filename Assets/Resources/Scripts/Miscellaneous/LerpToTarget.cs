@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class LerpToTarget : MonoBehaviour
 {
@@ -15,7 +12,7 @@ public class LerpToTarget : MonoBehaviour
         _target = target;
     }
     public void SetSpeed(float speed)
-    { 
+    {
         _lerpSpeed = speed;
     }
 

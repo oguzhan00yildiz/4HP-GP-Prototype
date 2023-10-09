@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Text;
+using JetBrains.Annotations;
 using TMPro;
-using System.Text;
+using UnityEngine;
+using UnityEngine.UI;
 
 public partial class UpgradeManager
 {
@@ -9,7 +10,7 @@ public partial class UpgradeManager
     // Without having to do GetComponent every time we want to access text and image in the button etc
     private class UpgradeButton
     {
-        public SkillUpgrade Upgrade;
+        public StatUpgrade Upgrade;
         private Button _uiButton;
         private Image _uiImage;
         private TMP_Text _uiTitle;
@@ -17,18 +18,18 @@ public partial class UpgradeManager
         private TMP_Text _uiFlavorText;
         public bool enabled
         {
-            get { return _uiButton.enabled; }
-            set { _uiButton.enabled = value; }
+            get => _uiButton.enabled;
+            set => _uiButton.enabled = value;
         }
         public Button.ButtonClickedEvent onClick
         {
-            get { return _uiButton.onClick; }
-            set { _uiButton.onClick = value; }
+            get => _uiButton.onClick;
+            set => _uiButton.onClick = value;
         }
         public bool interactable
         {
-            get { return _uiButton.interactable; }
-            set { _uiButton.interactable = value; }
+            get => _uiButton.interactable;
+            set => _uiButton.interactable = value;
         }
 
         public UpgradeButton(GameObject buttonObj)
@@ -50,7 +51,7 @@ public partial class UpgradeManager
             _uiButton.gameObject.SetActive(value);
         }
 
-        public void SetInfoFromUpgrade(SkillUpgrade upgrade)
+        public void SetInfoFromUpgrade([NotNull] StatUpgrade upgrade)
         {
             // Store upgrade in this button.
             Upgrade = upgrade;
@@ -64,121 +65,64 @@ public partial class UpgradeManager
 
             // Format information to display in the info,
             // based on the upgrade's stat changes.
-
-            // Tank-specific info.
-            if (upgrade is TankUpgrade)
+            
+            foreach (var statChange in upgrade.StatChanges)
             {
-                var tUpgrade = (TankUpgrade)upgrade;
+                // No difference to display.
+                if (statChange.Difference == 0)
+                    continue;
 
-                Debug.Log("Tank-specific upgrade info display isn't implemented yet!");
+                string statName = "";
+
+                // Display the effect type in a more readable format.
+                switch (statChange.AffectedStat)
+                {
+                    case StatUpgrade.Stat.AttackDamage:
+                        statName = upgrade switch
+                        {
+                            TankUpgrade => "Melee Damage",
+                            ArcherUpgrade => "Arrow Damage",
+                            not null => "Damage"
+                        };
+                        break;
+                    case StatUpgrade.Stat.AttackSpeed:
+                        statName = upgrade switch
+                        {
+                            TankUpgrade => "Melee Speed",
+                            ArcherUpgrade => "Firing Speed",
+                            not null => "Attack Speed"
+                        };
+                        break;
+                    case StatUpgrade.Stat.MeleeRange:
+                        statName = "Melee Range";
+                        break;
+                    case StatUpgrade.Stat.MoveSpeed:
+                        statName = "Movement Speed";
+                        break;
+                    case StatUpgrade.Stat.MaxHealth:
+                        statName = "Health";
+                        break;
+                    case StatUpgrade.Stat.CritDamage:
+                        statName = "Critical Damage";
+                        break;
+                    case StatUpgrade.Stat.CritChance:
+                        statName = "Critical Chance";
+                        break;
+                    case StatUpgrade.Stat.Armor:
+                        statName = "Armor";
+                        break;
+                    case StatUpgrade.Stat.Knockback:
+                        statName = "Knockback";
+                        break;
+                }
+
+                builder.AppendLine(statChange.Difference > 0
+                    ? $"<color=\"green\">+{statChange.Difference}% {statName}"
+                    : $"<color=\"red\">{statChange.Difference}% {statName}");
             }
-            // Archer-specific info.
-            else if (upgrade is ArcherUpgrade)
-            {
-                var aUpgrade = (ArcherUpgrade)upgrade;
 
-                Debug.Log("Archer-specific upgrade info display isn't implemented yet!");
-            }
-
-            // General upgrade info.
-            else
-            {
-                float atkIncrease = upgrade.AttackDamagePercentageIncrease;
-                float atkSpdIncrease = upgrade.AttackSpeedPercentageIncrease;
-                float movSpdIncrease = upgrade.MoveSpeedPercentageIncrease;
-                float critDmgIncrease = upgrade.CritDamagePercentageIncrease;
-                float critChanceIncrease = upgrade.CritDmgChancePercentageIncrease;
-                float armorIncrease = upgrade.ArmorPercentageIncrease;
-
-                // If more than a 1% increase/decrease
-                if (upgrade.AffectDamage && atkIncrease != 0)
-                {
-                    switch (atkIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{atkIncrease}% damage");
-                            break;
-                        case < 0:
-                            // Add red-colored percentage ("-50% damage")
-                            builder.AppendLine($"<color=\"red\">-{atkIncrease}% damage");
-                            break;
-                    }
-                }
-
-                // Doing the same as above for attack speed and movement speed
-                if (upgrade.AffectAttackSpeed && atkSpdIncrease != 0)
-                {
-                    switch (atkSpdIncrease)
-                    {
-                        case > 0:
-                            builder.AppendLine($"<color=\"green\">+{atkSpdIncrease}% attack speed");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{atkSpdIncrease}% attack speed");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectMoveSpeed && movSpdIncrease != 0)
-                {
-                    switch (movSpdIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{movSpdIncrease}% movement speed");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{movSpdIncrease}% movement speed");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectArmor && armorIncrease != 0)
-                {
-                    switch (armorIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{armorIncrease}% armor");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{armorIncrease}% armor");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectCritChance && critChanceIncrease != 0)
-                {
-                    switch (critChanceIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{critChanceIncrease}% critical chance");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{critChanceIncrease}% critical chance");
-                            break;
-                    }
-                }
-
-                if (upgrade.AffectCritDmg && critDmgIncrease != 0)
-                {
-                    switch (critDmgIncrease)
-                    {
-                        case > 0:
-                            // Add green-colored percentage ("+50% damage")
-                            builder.AppendLine($"<color=\"green\">+{critDmgIncrease}% critical damage");
-                            break;
-                        case < 0:
-                            builder.AppendLine($"<color=\"red\">-{critDmgIncrease}% critical damage");
-                            break;
-                    }
-                }
-
-                _uiInfoText.text = builder.ToString();
-                _uiFlavorText.text = upgrade.FlavorText;
-            }
+            _uiInfoText.text = builder.ToString();
+            _uiFlavorText.text = upgrade.FlavorText;
         }
     }
 }

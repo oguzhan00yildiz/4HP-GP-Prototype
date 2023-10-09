@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class VersionFinder : MonoBehaviour
 {
@@ -18,6 +15,6 @@ public class VersionFinder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
