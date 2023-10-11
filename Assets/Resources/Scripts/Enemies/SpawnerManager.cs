@@ -10,6 +10,7 @@ namespace Enemies
         [HideInInspector] public int currentWave = 1;
 
         private List<Enemy> _enemies = new();
+        private Dictionary<ulong, bool> _enemiesAlive = new();
 
         private List<GameObject> _spawnPool = new();
         private Transform _player;
@@ -21,8 +22,15 @@ namespace Enemies
         private const float SpawnRadius = 15;
         private const float EnemiesPerSecond = 2;
         private const int MaxEnemiesPerRound = 50;
+        private ulong _enemyIdBase = 0;
 
         private bool _initialized;
+
+        public bool IsEnemyAlive(ulong id)
+            =>  _enemiesAlive.TryGetValue(id, out bool isAlive) && isAlive;
+
+        public void SetEnemyDead(ulong id)
+            => _enemiesAlive.Remove(id);
 
         public void Initialize()
         {
@@ -130,6 +138,12 @@ namespace Enemies
             return new Vector3(spawnX, spawnY, 0f);
         }
 
+        private ulong GetNewEnemyId()
+        {
+            _enemyIdBase++;
+            return _enemyIdBase;
+        }
+
         // This method spawns the whole list, by spawning the first enemy and then deleting it from the list
         private void SpawnEnemy()
         {
@@ -138,7 +152,12 @@ namespace Enemies
 
             // Spawning the list of enemies that has been generated
             var spawnedEnemy = Instantiate(_spawnPool[0], PickRandomSpawnPoint(), Quaternion.identity);
-            spawnedEnemy.GetComponent<Enemy>().Initialize();
+
+            ulong newId = GetNewEnemyId();
+            spawnedEnemy.GetComponent<Enemy>().InitializeSetId(newId);
+
+            _enemiesAlive.Add(newId, true);
+
             _spawnPool.RemoveAt(0);
         }
 

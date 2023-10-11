@@ -8,6 +8,9 @@ namespace Enemies
 {
     public abstract class Enemy : MonoBehaviour, IEnemy
     {
+        public ulong Id
+            => Data.GetId();
+
         [Header("Enemy Stats")] 
         public string EnemyName;
         public int Health;
@@ -101,6 +104,12 @@ namespace Enemies
             }
 
             _initialized = true;
+        }
+
+        public void InitializeSetId(ulong id)
+        {
+            Data.SetId(id);
+            Initialize();
         }
 
         protected virtual void Update()
