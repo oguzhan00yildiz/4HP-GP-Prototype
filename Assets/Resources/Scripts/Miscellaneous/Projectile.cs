@@ -12,7 +12,7 @@ public class Projectile : MonoBehaviour
     protected Vector2 _origin, _target;
     protected Transform _targetTransform;
 
-    protected bool _hitEnemy = false;
+    protected bool HitEnemy = false;
 
     public virtual void InitializeProjectileWithTransform(Vector2 origin, Transform target, Color? color = null)
     {
@@ -108,7 +108,7 @@ public class Projectile : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             _hitCollision = collision;
-            _hitEnemy = true;
+            HitEnemy = true;
         }
     }
 
@@ -172,7 +172,7 @@ public class Projectile : MonoBehaviour
 
             // If hit prematurely or lifetime is over max
             // TODO: (_hit is not set anywhere yet)
-            if (_hitEnemy || lifeFrames > maxLifetimeFrames)
+            if (HitEnemy || lifeFrames > maxLifetimeFrames)
                 break;
 
             lifeFrames++;
@@ -189,7 +189,7 @@ public class Projectile : MonoBehaviour
         }
 
         // If we don't have a target 
-        else if (_targetTransform == null && _hitEnemy)
+        else if (_targetTransform == null && HitEnemy)
         {
             var enemyObj = _hitCollision.gameObject;
             GameManager.Instance.EnemyHit(enemyObj, _damage);

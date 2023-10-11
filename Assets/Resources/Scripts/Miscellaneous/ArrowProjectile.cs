@@ -68,8 +68,8 @@ public class ArrowProjectile : Projectile
             spriteContainer.rotation = _rotation;
 
             // If hit prematurely or lifetime is over max
-            // TODO: (_hitEnemy is not set anywhere yet)
-            if (_hitEnemy || lifeFrames > maxLifetimeFrames)
+            // TODO: (HitEnemy is not set anywhere yet)
+            if (HitEnemy || lifeFrames > maxLifetimeFrames)
                 break;
 
             lifeFrames++;
@@ -87,7 +87,7 @@ public class ArrowProjectile : Projectile
         }
 
         // If we don't have a target 
-        else if (_targetTransform == null && _hitEnemy)
+        else if (_targetTransform == null && HitEnemy)
         {
             var enemyObj = _hitCollision.gameObject;
             GameManager.Instance.EnemyHit(enemyObj, _damage);

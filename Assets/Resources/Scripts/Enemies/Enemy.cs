@@ -1,4 +1,5 @@
 using System.Collections;
+using Global;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,10 +9,14 @@ namespace Enemies
 {
     public abstract class Enemy : MonoBehaviour, IEnemy
     {
+        public ulong Id
+            => Data.GetId();
+
         [Header("Enemy Stats")] 
         public string EnemyName;
         public int Health;
         [SerializeField] protected float MoveSpeed;
+        [SerializeField] protected float TurnSpeed;
         [SerializeField] protected float AttackSpeed;
         [SerializeField] protected float AttackRange;
         [SerializeField] protected int Damage;
@@ -94,13 +99,20 @@ namespace Enemies
             if (Rb == null)
             {
                 Rb = gameObject.AddComponent<Rigidbody2D>();
-                Rb.bodyType = RigidbodyType2D.Kinematic;
+                Rb.bodyType = RigidbodyType2D.Dynamic;
+                Rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
                 Rb.gravityScale = 0.0f;
                 Rb.freezeRotation = true;
                 Rb.interpolation = RigidbodyInterpolation2D.Interpolate;
             }
 
             _initialized = true;
+        }
+
+        public void InitializeSetId(ulong id)
+        {
+            Data.SetId(id);
+            Initialize();
         }
 
         protected virtual void Update()
@@ -113,8 +125,15 @@ namespace Enemies
             if (Target != null)
             {
                 // Not normalized since we'll use magnitude to gauge distance
-                Vector3 direction = (Target.position - transform.position);
-                TargetDirection = direction;
+
+                // Get target position and add some jitter to make it look more natural
+                Vector2 targetPos = (Vector2)Target.position + Random.insideUnitCircle * 0.1f;
+
+                // Get direction to target
+                Vector2 direction = targetPos - (Vector2)transform.position;
+
+                // Lerp to the new direction
+                TargetDirection = Vector2.Lerp(TargetDirection, direction, Time.deltaTime * TurnSpeed);
 
                 // Move in fixed update
             }
@@ -124,21 +143,31 @@ namespace Enemies
         {
             if (Rb == null)
                 return;
-            Vector2 moveAmount = transform.position + TargetDirection.normalized * MoveSpeed * Time.fixedDeltaTime;
-            //Vector2 moveAmount = TargetDirection.normalized * MoveSpeed;
 
-            // TODO: Fix knockback (too snappy/laggy looking rn)
-            if(KnockbackVector.magnitude > 0.01f)
-                moveAmount += KnockbackVector * Time.fixedDeltaTime;
+            // Calculate movement
+            Vector2 positionChange = MoveSpeed * Time.fixedDeltaTime * TargetDirection.normalized;
 
+            // Slow down if we're close to the target
+            if(TargetDirection.magnitude < AttackRange * 0.75f)
+                positionChange = Vector2.Lerp(positionChange, Vector2.zero, 7f * Time.fixedDeltaTime);
+
+            // Apply knockback
+            if (KnockbackVector.magnitude > 0.01f)
+                positionChange += KnockbackVector * Time.fixedDeltaTime;
+
+            // Lerp knockback to zero
             KnockbackVector = Vector2.Lerp(KnockbackVector, Vector2.zero, 5f * Time.fixedDeltaTime);
 
-            //Rb.velocity += moveAmount * Time.fixedDeltaTime;
-            Rb.MovePosition(moveAmount);
+            Vector2 newPosition = Rb.position + positionChange;
+            
+            // Move with rigidbody
+            Rb.MovePosition(newPosition);
         }
 
         public void Die()
         {
+            // TODO: This is where you could play a death animation
+            // TODO: or something
             throw new System.NotImplementedException();
         }
 

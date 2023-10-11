@@ -1,6 +1,7 @@
 using Enemies;
 using PlayerLogic;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -33,10 +34,12 @@ namespace Global
         private UpgradeManager _upgradeManager;
         private ProjectileManager _projectileManager;
         private BasePlayer _player;
+        
+
         [SerializeField] private IPlayer.PlayerCharacter _playerType;
         [SerializeField] private Texture2D cursorTexture;
 
-        private int _killedEnemies;
+        private int _numKilledEnemies;
         private bool _playerReady;
 
         private static GameObject _popUpTextPrefab;
@@ -44,6 +47,7 @@ namespace Global
         [Header("Debug")]
         [SerializeField] private bool _enableDebug;
         [SerializeField] private bool _godMode;
+        [SerializeField] private bool _nerfPlayer;
 
         #region Singleton
         private static GameManager _instance;
@@ -167,16 +171,16 @@ namespace Global
             if (enemy == null)
                 return;
 
-            enemy.TakeDamage(damage, source, knockback);
-
-            if (enemy.Health <= 0)
-            {
-                KillEnemy(enemy);
-            }
+            EnemyHitWithKnockback(enemy, damage, source, knockback);
         }
 
         public void EnemyHitWithKnockback(Enemy enemy, int damage, Vector2 source, float knockback)
         {
+            if (DebugMode && _nerfPlayer)
+            {
+                return;
+            }
+
             enemy.TakeDamage(damage, source, knockback);
 
             if (enemy.Health <= 0)
@@ -187,11 +191,16 @@ namespace Global
 
         public void EnemyHit(Enemy enemy, int damage)
         {
+            if (_nerfPlayer)
+            {
+                return;
+            }
+
             enemy.TakeDamage(damage);
 
             if (enemy.Health <= 0)
             {
-                KillEnemy(enemy.gameObject);
+                KillEnemy(enemy);
             }
         }
 
@@ -205,37 +214,21 @@ namespace Global
 
         private void KillEnemy(Enemy enemy)
         {
+            if (!EnemyManager.IsEnemyAlive(enemy.Id))
+                return;
+
+            EnemyManager.SetEnemyDead(enemy.Id);
+
             Destroy(enemy.gameObject);
-            _killedEnemies++;
-            var progressPercentage = (float)_killedEnemies
+            _numKilledEnemies++;
+            var progressPercentage = (float)_numKilledEnemies
                                      / (_enemyManager.TotalNumSpawned != 0
                                         ? _enemyManager.TotalNumSpawned
                                         : 1);
 
             CanvasManager.UpdateProgress(progressPercentage);
 
-            if (_killedEnemies < _enemyManager.TotalNumSpawned)
-            {
-                return;
-            }
-
-            ClearKilledEnemyCounter();
-            CanvasManager.ShowWaveCompletionScreen();
-            // Start waiting for player to be ready to start next wave
-            StartCoroutine(PlayerContinueWaiter());
-        }
-
-        // Kills the enemy
-        private void KillEnemy(GameObject enemyGameObject)
-        {
-            Destroy(enemyGameObject);
-            _killedEnemies++;
-            var progressPercentage = (float)_killedEnemies / (_enemyManager.TotalNumSpawned != 0
-                ? _enemyManager.TotalNumSpawned
-                : 1);
-            CanvasManager.UpdateProgress(progressPercentage);
-
-            if (_killedEnemies < _enemyManager.TotalNumSpawned)
+            if (_numKilledEnemies < _enemyManager.TotalNumSpawned)
             {
                 return;
             }
@@ -278,7 +271,7 @@ namespace Global
 
         public void ClearKilledEnemyCounter()
         {
-            _killedEnemies = 0;
+            _numKilledEnemies = 0;
         }
 
         private void SetCursor()
