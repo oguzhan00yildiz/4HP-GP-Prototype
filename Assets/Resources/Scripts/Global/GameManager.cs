@@ -47,6 +47,7 @@ namespace Global
         [Header("Debug")]
         [SerializeField] private bool _enableDebug;
         [SerializeField] private bool _godMode;
+        [SerializeField] private bool _nerfPlayer;
 
         #region Singleton
         private static GameManager _instance;
@@ -175,6 +176,11 @@ namespace Global
 
         public void EnemyHitWithKnockback(Enemy enemy, int damage, Vector2 source, float knockback)
         {
+            if (DebugMode && _nerfPlayer)
+            {
+                return;
+            }
+
             enemy.TakeDamage(damage, source, knockback);
 
             if (enemy.Health <= 0)
@@ -185,6 +191,11 @@ namespace Global
 
         public void EnemyHit(Enemy enemy, int damage)
         {
+            if (_nerfPlayer)
+            {
+                return;
+            }
+
             enemy.TakeDamage(damage);
 
             if (enemy.Health <= 0)
@@ -215,27 +226,6 @@ namespace Global
                                         ? _enemyManager.TotalNumSpawned
                                         : 1);
 
-            CanvasManager.UpdateProgress(progressPercentage);
-
-            if (_numKilledEnemies < _enemyManager.TotalNumSpawned)
-            {
-                return;
-            }
-
-            ClearKilledEnemyCounter();
-            CanvasManager.ShowWaveCompletionScreen();
-            // Start waiting for player to be ready to start next wave
-            StartCoroutine(PlayerContinueWaiter());
-        }
-
-        // Kills the enemy
-        private void KillEnemy(GameObject enemyGameObject)
-        {
-            Destroy(enemyGameObject);
-            _numKilledEnemies++;
-            var progressPercentage = (float)_numKilledEnemies / (_enemyManager.TotalNumSpawned != 0
-                ? _enemyManager.TotalNumSpawned
-                : 1);
             CanvasManager.UpdateProgress(progressPercentage);
 
             if (_numKilledEnemies < _enemyManager.TotalNumSpawned)

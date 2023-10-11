@@ -99,7 +99,7 @@ CircleCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -137,6 +137,7 @@ MonoBehaviour:
   EnemyName: Enemy2
   Health: 15
   MoveSpeed: 3.6
+  TurnSpeed: 10
   AttackSpeed: 1.4
   AttackRange: 1
   Damage: 2
