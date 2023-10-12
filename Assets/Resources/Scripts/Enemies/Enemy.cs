@@ -44,7 +44,7 @@ namespace Enemies
             int originalHealth = Health;
             Health -= amount;
 
-            StartCoroutine(UpdateHealthBar(originalHealth, Health));
+            //StartCoroutine(UpdateHealthBar(originalHealth, Health));
             DisplayDamageNumber(transform.position, amount);
 
             if (!damageOrigin.HasValue)
@@ -90,6 +90,7 @@ namespace Enemies
             HealthBar = transform.Find("WorldCanvas/HealthBar").GetComponent<Slider>();
             HealthBar.maxValue = Health;
             HealthBar.value = Health;
+            HealthBar.gameObject.SetActive(false);
 
             if (_popUpTextPrefab == null)
                 _popUpTextPrefab = Resources.Load<GameObject>("Prefabs/Enemies/EnemyDamagePopUp");
