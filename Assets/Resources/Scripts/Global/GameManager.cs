@@ -1,7 +1,6 @@
 using Enemies;
 using PlayerLogic;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -10,8 +9,29 @@ namespace Global
     [RequireComponent(typeof(SpawnerManager), typeof(UpgradeManager), typeof(ProjectileManager))]
     public class GameManager : MonoBehaviour
     {
+        #region Singleton
+        private static GameManager _instance;
+        public static GameManager Instance
+        {
+            get
+            {
+                if (_instance != null)
+                    return _instance;
+                _instance = FindObjectOfType<GameManager>();
+
+                if (_instance != null)
+                    return _instance;
+                var obj = new GameObject("GameManager");
+                _instance = obj.AddComponent<GameManager>();
+
+                return _instance;
+            }
+        }
+        #endregion
+
         // Public static references
         // Use these to access game instance references.
+        #region Static References
         public static bool DebugMode
             => _instance._enableDebug;
         public static CanvasManager CanvasManager
@@ -24,10 +44,11 @@ namespace Global
             => _instance._projectileManager;
 
         public static BasePlayer Player
-        => _instance._player;
+            => _instance._player;
 
         public static SpawnerManager EnemyManager
             => _instance._enemyManager;
+        #endregion
 
         private CanvasManager _canvasManager;
         private SpawnerManager _enemyManager;
@@ -48,26 +69,6 @@ namespace Global
         [SerializeField] private bool _enableDebug;
         [SerializeField] private bool _godMode;
         [SerializeField] private bool _nerfPlayer;
-
-        #region Singleton
-        private static GameManager _instance;
-        public static GameManager Instance
-        {
-            get
-            {
-                if (_instance != null)
-                    return _instance;
-                _instance = FindObjectOfType<GameManager>();
-
-                if (_instance != null)
-                    return _instance;
-                var obj = new GameObject("GameManager");
-                _instance = obj.AddComponent<GameManager>();
-
-                return _instance;
-            }
-        }
-        #endregion
 
         private void OnEnable()
         {
