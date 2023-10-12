@@ -13,7 +13,7 @@ namespace Enemies
 
             TimeAtLastAttack = timeNow;
 
-            if (Vector2.Distance(transform.position, GameManager.Player.Position) <= AttackRange)
+            if (Vector2.Distance(transform.position, GameManager.LeaderPlayer.Position) <= AttackRange)
             {
                 GameManager.Instance.PlayerHit(1);
             }

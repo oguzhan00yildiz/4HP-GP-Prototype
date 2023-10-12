@@ -19,6 +19,10 @@ namespace PlayerLogic
             }
             return false;
         }
+        public bool IsAIPlayer
+            => _isAIPlayer && !IsLeader;
+        public bool IsLeader
+            => _isLeader;
 
         public PlayerStatInfo StatInfo { get; set; }
         public Vector2 Position
@@ -46,7 +50,40 @@ namespace PlayerLogic
 
         protected GameObject DamagePopUpPrefab;
 
+        private bool _isLeader;
+        private bool _isAIPlayer;
+        private float _aiStoppingDistance = 2.5f;
+
         // No constructor needed, since we're using Unity's MonoBehaviour
+
+        public void SetAsLeader()
+        {
+            if (GameManager.LeaderPlayer != this)
+                return;
+
+            _isLeader = true;
+        }
+
+        public void SetAsAIPlayer()
+        {
+            _isAIPlayer = true;
+        }
+
+        protected Vector2 CalculateAI_Input()
+        {
+            // Right now just follows leader player
+            var playerPos = GameManager.LeaderPlayer.Position;
+            var myPos = Position;
+
+            var dist = Vector2.Distance(playerPos, myPos);
+
+            if (dist < _aiStoppingDistance)
+                return Vector2.zero;
+
+            var dir = (playerPos - myPos).normalized;
+
+            return dir;
+        }
 
         public CameraController CreateCameraWithController()
         {
@@ -110,31 +147,40 @@ namespace PlayerLogic
 
         public virtual void UpdateMovement(float walkSpeed)
         {
-            // store input in vector
-            Vector2 input = new Vector2()
+            Vector2 desiredMovement;
+            if (IsAIPlayer)
             {
-                x = Input.GetAxisRaw("Horizontal"),
-                y = Input.GetAxisRaw("Vertical"),
-            };
+                desiredMovement = CalculateAI_Input();
+            }
+            else
+            {
+                desiredMovement = new Vector2()
+                {
+                    x = Input.GetAxisRaw("Horizontal"),
+                    y = Input.GetAxisRaw("Vertical"),
+                };
+            }
 
             // Align vectors to directions ON SCREEN
             // Also normalize them so their length is 1
+            // TODO: This is completely unnecessary, since we're 2D top-down
+
             Vector2 screenRight = Vector2.right;
             Vector2 screenUp = Vector2.up;
 
             Vector2 screenMovement = (Vector2.zero
-                + screenRight * input.x
-                + screenUp * input.y).normalized;
+                + screenRight * desiredMovement.x
+                + screenUp * desiredMovement.y).normalized;
 
             // Multiply movement vector by walk speed
             screenMovement *= walkSpeed;
 
             // Lerp movement towards 0 if the player is not desiring to move (smoother stop)
-            bool moving = input.magnitude > 0;
+            bool moving = desiredMovement.magnitude > 0;
 
             // Player should face left if they are trying to move left BUT are not attacking
             bool facesLeft = NextMovement.x < 0;
-            if (!AttackHeld && moving)
+            if (moving)
                 SetFacing(facesLeft);
 
             // Player is backtracking if facing left but moving right or vice versa

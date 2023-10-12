@@ -106,7 +106,7 @@ public partial class UpgradeManager : MonoBehaviour
         {
             // Further check what kind of upgrade it is, and only add it to the list
             // if the character in use can "use" the upgrade
-            var character = GameManager.Player.Character;
+            var character = GameManager.LeaderPlayer.Character;
             switch (upgrade)
             {
                 // If it's null, the scriptableObject found was not of type StatUpgrade,
@@ -214,7 +214,7 @@ public partial class UpgradeManager : MonoBehaviour
     public void SelectUpgrade(int buttonIndex)
     {
         var upgrade = _upgradeButtons[buttonIndex].Upgrade;
-        GameManager.Player.ReceiveUpgrade(upgrade);
+        GameManager.LeaderPlayer.ReceiveUpgrade(upgrade);
         TogglePanel(false);
         GameManager.Instance.PlayerSetReady();
     }

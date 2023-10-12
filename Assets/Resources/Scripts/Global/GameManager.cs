@@ -23,8 +23,11 @@ namespace Global
         public static ProjectileManager Projectiles
             => _instance._projectileManager;
 
-        public static BasePlayer Player
-        => _instance._player;
+        public static BasePlayer LeaderPlayer
+            => _instance._leaderPlayer;
+
+        public static List<BasePlayer> Players
+            => _instance._players;
 
         public static SpawnerManager EnemyManager
             => _instance._enemyManager;
@@ -33,9 +36,10 @@ namespace Global
         private SpawnerManager _enemyManager;
         private UpgradeManager _upgradeManager;
         private ProjectileManager _projectileManager;
-        private BasePlayer _player;
-        
 
+        private List<BasePlayer> _players;
+        private BasePlayer _leaderPlayer;
+        
         [SerializeField] private IPlayer.PlayerCharacter _playerType;
         [SerializeField] private Texture2D cursorTexture;
 
@@ -89,7 +93,12 @@ namespace Global
 
         public void Initialize()
         {
-            _player = CreatePlayer(_playerType, true);
+            _leaderPlayer = CreatePlayer(_playerType, false);
+            var avbType = _playerType == IPlayer.PlayerCharacter.Archer
+                ? IPlayer.PlayerCharacter.Tank
+                : IPlayer.PlayerCharacter.Archer;
+            var player2 = CreatePlayer(avbType, false);
+            player2.SetAsAIPlayer();
 
             _popUpTextPrefab = Resources.Load<GameObject>("Prefabs/Effects/DamagePopUpParent");
 
@@ -105,6 +114,17 @@ namespace Global
             _enemyManager.Initialize();
 
             _projectileManager = gameObject.GetComponent<ProjectileManager>();
+
+            _leaderPlayer.SetAsLeader();
+
+            _players = new List<BasePlayer> { _leaderPlayer, player2 };
+
+            foreach (BasePlayer player in _players)
+            {
+                player.Initialize();
+            }
+
+            _playerReady = true;
 
             SetCursor();
         }
@@ -162,7 +182,7 @@ namespace Global
                 return;
             }
 
-            _player.TakeDamage(damage);
+            _leaderPlayer.TakeDamage(damage);
         }
 
         public void EnemyHitWithKnockback(GameObject enemyObject, int damage, Vector2 source, float knockback)

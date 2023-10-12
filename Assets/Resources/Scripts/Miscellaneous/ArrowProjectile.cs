@@ -89,8 +89,12 @@ public class ArrowProjectile : Projectile
         // If we don't have a target 
         else if (_targetTransform == null && HitEnemy)
         {
-            var enemyObj = _hitCollision.gameObject;
-            GameManager.Instance.EnemyHit(enemyObj, _damage);
+            GameObject enemyObj = null;
+            if (_hitCollision != null)
+                enemyObj = _hitCollision.gameObject;
+
+            if(enemyObj != null)
+                GameManager.Instance.EnemyHit(enemyObj, _damage);
         }
 
         // Destroy the gameObject
