@@ -126,7 +126,7 @@ namespace PlayerLogic
                 Rb.gravityScale = 0;
             }
 
-            Model = GameObject.FindWithTag("PlayerModel").transform;
+            Model = transform.Find("Model");
 
             ModelRenderer = Model.GetComponentInChildren<SpriteRenderer>();
 

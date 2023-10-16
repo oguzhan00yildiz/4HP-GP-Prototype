@@ -1,7 +1,9 @@
 ﻿using Global;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.PlayerSettings;
 
 namespace PlayerLogic
 {
@@ -52,7 +54,44 @@ namespace PlayerLogic
 
         private bool _isLeader;
         private bool _isAIPlayer;
-        private float _aiStoppingDistance = 2.5f;
+
+        protected BotLogic CPULogic;
+
+        protected struct BotLogic
+        {
+            private bool _forcedMove;
+            public static readonly float StoppingDistance = 2.5f;
+            public static readonly float MaxDistanceFromPlayer = 12.0f;
+
+            public bool ShouldForceMoveToPlayer(float distFromPlayer)
+            {
+                var force = distFromPlayer > MaxDistanceFromPlayer;
+                if (force)
+                    _forcedMove = true;
+                return force;
+            }
+
+            public bool ShouldMoveTowardsPlayer(float distFromPlayer)
+            {
+                if (_forcedMove && !IsTooCloseToPlayer(distFromPlayer))
+                    return true;
+
+                return !IsTooCloseToPlayer(distFromPlayer);
+            }
+
+            public bool IsTooCloseToPlayer(float distFromPlayer)
+            {
+                bool tooClose = distFromPlayer < StoppingDistance / 2;
+                if(tooClose)
+                    _forcedMove = false;
+                return tooClose;
+            }
+
+            public static float GetDistanceToPlayer(Vector2 myPos)
+            {
+                return Vector2.Distance(GameManager.LeaderPlayer.Position, myPos);
+            }
+        }
 
         // No constructor needed, since we're using Unity's MonoBehaviour
 
@@ -71,18 +110,56 @@ namespace PlayerLogic
 
         protected Vector2 CalculateAI_Input()
         {
-            // Right now just follows leader player
+            Vector2 inputDir;
+
             var playerPos = GameManager.LeaderPlayer.Position;
             var myPos = Position;
 
-            var dist = Vector2.Distance(playerPos, myPos);
+            float distanceToPlayer = Vector2.Distance(playerPos, myPos);
 
-            if (dist < _aiStoppingDistance)
-                return Vector2.zero;
+            bool forceFollow = CPULogic.ShouldForceMoveToPlayer(distanceToPlayer);
+            bool shouldMoveTowardsPlayer = CPULogic.ShouldMoveTowardsPlayer(distanceToPlayer);
+            bool tooClose = CPULogic.IsTooCloseToPlayer(distanceToPlayer);
 
-            var dir = (playerPos - myPos).normalized;
+            // if should force AI to move towards the player
+            if (forceFollow)
+            {
+                inputDir = (playerPos - myPos).normalized;
+                return inputDir;
+            }
 
-            return dir;
+            // if too close to player, move away
+            if (tooClose)
+            {
+                forceFollow = false;
+                inputDir = (myPos - playerPos).normalized;
+                return inputDir;
+            }
+
+            // if the checks did not fire, we can focus on attacking enemies
+            var visibleEnemies = Physics2D.OverlapCircleAll(myPos, 10.0f, EnemyLayer);
+            if (visibleEnemies.Length > 0)
+            {
+                var closestEnemy = visibleEnemies[0];
+                float closestDist = Vector2.Distance(myPos, closestEnemy.transform.position);
+                Vector2 closestEnemyPos = closestEnemy.transform.position;
+
+                foreach (var enemy in visibleEnemies)
+                {
+                    float dist = Vector2.Distance(myPos, enemy.transform.position);
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closestEnemy = enemy;
+                    }
+                }
+
+                inputDir = (closestEnemyPos - myPos).normalized;
+                return inputDir;
+            }
+
+
+            return Vector2.zero;
         }
 
         public CameraController CreateCameraWithController()

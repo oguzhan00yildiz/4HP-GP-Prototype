@@ -41,17 +41,19 @@ namespace Global
         private BasePlayer _leaderPlayer;
         
         [SerializeField] private IPlayer.PlayerCharacter _playerType;
-        [SerializeField] private Texture2D cursorTexture;
+        private Texture2D cursorTexture;
 
         private int _numKilledEnemies;
-        private bool _playerReady;
+        private bool _playerReadyForNextWave;
 
         private static GameObject _popUpTextPrefab;
 
+        [Space(10)]
         [Header("Debug")]
         [SerializeField] private bool _enableDebug;
         [SerializeField] private bool _godMode;
         [SerializeField] private bool _nerfPlayer;
+        [SerializeField] private bool _spawnBotPlayer;
 
         #region Singleton
         private static GameManager _instance;
@@ -94,11 +96,7 @@ namespace Global
         public void Initialize()
         {
             _leaderPlayer = CreatePlayer(_playerType, false);
-            var avbType = _playerType == IPlayer.PlayerCharacter.Archer
-                ? IPlayer.PlayerCharacter.Tank
-                : IPlayer.PlayerCharacter.Archer;
-            var player2 = CreatePlayer(avbType, false);
-            player2.SetAsAIPlayer();
+            
 
             _popUpTextPrefab = Resources.Load<GameObject>("Prefabs/Effects/DamagePopUpParent");
 
@@ -117,16 +115,28 @@ namespace Global
 
             _leaderPlayer.SetAsLeader();
 
-            _players = new List<BasePlayer> { _leaderPlayer, player2 };
+            if (_spawnBotPlayer)
+            {
+                var avbType = _playerType == IPlayer.PlayerCharacter.Archer
+                    ? IPlayer.PlayerCharacter.Tank
+                    : IPlayer.PlayerCharacter.Archer;
+                var player2 = CreatePlayer(avbType, false);
+                player2.SetAsAIPlayer();
+                _players = new List<BasePlayer> { _leaderPlayer, player2 };
+            }
+            else
+            {
+                _players = new List<BasePlayer> { _leaderPlayer };
+            }
 
             foreach (BasePlayer player in _players)
             {
-                player.Initialize();
+                player?.Initialize();
             }
 
-            _playerReady = true;
-
             SetCursor();
+
+            _playerReadyForNextWave = true;
         }
 
         private static BasePlayer CreatePlayer(IPlayer.PlayerCharacter type, bool initialize)
@@ -240,40 +250,39 @@ namespace Global
             EnemyManager.SetEnemyDead(enemy.Id);
 
             Destroy(enemy.gameObject);
-            _numKilledEnemies++;
-            var progressPercentage = (float)_numKilledEnemies
-                                     / (_enemyManager.TotalNumSpawned != 0
-                                        ? _enemyManager.TotalNumSpawned
-                                        : 1);
+            var progressPercentage = _enemyManager.GetWaveProgress01();
 
             CanvasManager.UpdateProgress(progressPercentage);
 
-            if (_numKilledEnemies < _enemyManager.TotalNumSpawned)
+            if (!_enemyManager.IsWaveFinished())
             {
                 return;
             }
 
+            _playerReadyForNextWave = false;
+
             ClearKilledEnemyCounter();
             CanvasManager.ShowWaveCompletionScreen();
+
             // Start waiting for player to be ready to start next wave
             StartCoroutine(PlayerContinueWaiter());
         }
 
         private IEnumerator PlayerContinueWaiter()
         {
-            while (!_playerReady)
+            while (!_playerReadyForNextWave)
             {
                 yield return new WaitForSeconds(0.25f);
             }
 
             _enemyManager.StartNextWave();
-            _playerReady = false;
+            _playerReadyForNextWave = false;
         }
 
         // Call this to set the internal flag to true to start the next wave
         public void PlayerSetReady()
         {
-            _playerReady = true;
+            _playerReadyForNextWave = true;
         }
 
         private void DisplayDamageNumber(Vector2 origin, int damageAmount)
@@ -298,7 +307,7 @@ namespace Global
         {
             if (cursorTexture == null)
             {
-                Debug.LogError("Cursor texture not set!");
+                //Debug.LogError("Cursor texture not set!");
                 return;
             }
             var cursorHotSpot = new Vector2(cursorTexture.width / 2, cursorTexture.height / 2);

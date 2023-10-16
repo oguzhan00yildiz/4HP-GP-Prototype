@@ -25,12 +25,22 @@ namespace Enemies
         private ulong _enemyIdBase = 0;
 
         private bool _initialized;
+        private int _enemiesKilled;
 
         public bool IsEnemyAlive(ulong id)
             =>  _enemiesAlive.TryGetValue(id, out bool isAlive) && isAlive;
 
         public void SetEnemyDead(ulong id)
-            => _enemiesAlive.Remove(id);
+        {
+            _enemiesAlive.Remove(id);
+            _enemiesKilled++;
+        }
+
+        public bool IsWaveFinished()
+            => _spawnPool.Count == 0 && _enemiesAlive.Count == 0;
+
+        public float GetWaveProgress01()
+            => (float)_enemiesKilled / _totalEnemySpawned;
 
         public void Initialize()
         {
@@ -41,7 +51,7 @@ namespace Enemies
             CalculateWaveBudget();
 
             // Finds the player
-            _player = GameObject.FindWithTag("Player").transform;
+            _player = GameManager.LeaderPlayer.transform;
 
             // All good
             _initialized = true;
@@ -152,6 +162,7 @@ namespace Enemies
 
             // Spawning the list of enemies that has been generated
             var spawnedEnemy = Instantiate(_spawnPool[0], PickRandomSpawnPoint(), Quaternion.identity);
+            _totalEnemySpawned++;
 
             ulong newId = GetNewEnemyId();
             spawnedEnemy.GetComponent<Enemy>().InitializeSetId(newId);
@@ -165,6 +176,10 @@ namespace Enemies
         public void StartNextWave()
         {
             currentWave++;
+
+            // avoid division by 0
+            _totalEnemySpawned = 1;
+            _enemiesKilled = 1;
             CalculateWaveBudget();
         }
     }

@@ -64,7 +64,7 @@ namespace PlayerLogic
 
             _meleeEffect = Resources.Load<GameObject>("Prefabs/Effects/Attacks/MeleeSwing");
 
-            Model = GameObject.FindWithTag("PlayerModel").transform;
+            Model = transform.Find("Model");
 
             ModelRenderer = Model.GetComponentInChildren<SpriteRenderer>();
 
