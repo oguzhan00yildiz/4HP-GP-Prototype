@@ -164,6 +164,12 @@ namespace PlayerLogic
                 NextMovement = Vector2.Lerp(NextMovement, Vector2.zero, Time.deltaTime * 15.0f);
             }
 
+            // Pressing escape will load back to the main menu
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GameManager.Instance.ReturnToMainMenu();
+            }
+
             // Movement updates happen in FixedUpdate since Unity physics run in that timeframe
         }
 

@@ -128,6 +128,12 @@ namespace Enemies
         // This method returns a random spawn point so for SpawnEnemy() to use
         private Vector3 PickRandomSpawnPoint()
         {
+            if (_player == null)
+            {
+                Debug.LogError("Player not found!");
+                return Vector3.zero;
+            }
+
             // Calculate random angle in radians
             var angle = Random.Range(0f, 2f * Mathf.PI);
 

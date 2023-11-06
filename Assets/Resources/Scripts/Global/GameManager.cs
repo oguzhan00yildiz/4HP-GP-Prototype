@@ -2,8 +2,10 @@ using Enemies;
 using PlayerLogic;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Global
 {
@@ -84,7 +86,58 @@ namespace Global
 
         private void Start()
         {
+            
+        }
+
+        public void StartGame()
+        {
+            if (_player != null)
+            {
+                Debug.LogWarning("Player already exists, game probably running. Trying to start game, what's up??");
+                return;
+            }
+
+            StartGameAsync();
+        }
+
+        public void ReturnToMainMenu()
+        {
+            Deinitialize();
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        }
+
+        private async void StartGameAsync()
+        {
+            // Asynchronous loading of the game scene
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("GameScene");
+
+            asyncLoad.allowSceneActivation = true;
+
+            // NOTE: Since our game is so small, we don't really
+            // need to wait for the loading to finish.
+            // But this is how you would do it if you needed to.
+
+            // While loading we let the game continue
+            while (!asyncLoad.isDone)
+            {
+                Debug.Log("Loading progress: " + asyncLoad.progress);
+                await Task.Delay(100);
+            }
+
+            // Set the game scene as the active scene.
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName("GameScene"));
+
+            // Finally, initialize the game
             Initialize();
+        }
+
+        public void Deinitialize()
+        {
+            Destroy(_player.gameObject);
+            Destroy(_canvasManager.gameObject);
+            Destroy(_enemyManager.gameObject);
+            Destroy(_upgradeManager.gameObject);
+            Destroy(_projectileManager.gameObject);
         }
 
         public void Initialize()
