@@ -1,37 +1,19 @@
 using Enemies;
 using PlayerLogic;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Global
 {
     [RequireComponent(typeof(SpawnerManager), typeof(UpgradeManager), typeof(ProjectileManager))]
     public class GameManager : MonoBehaviour
     {
-        #region Singleton
-        private static GameManager _instance;
-        public static GameManager Instance
-        {
-            get
-            {
-                if (_instance != null)
-                    return _instance;
-                _instance = FindObjectOfType<GameManager>();
-
-                if (_instance != null)
-                    return _instance;
-                var obj = new GameObject("GameManager");
-                _instance = obj.AddComponent<GameManager>();
-
-                return _instance;
-            }
-        }
-        #endregion
-
         // Public static references
         // Use these to access game instance references.
-        #region Static References
         public static bool DebugMode
             => _instance._enableDebug;
         public static CanvasManager CanvasManager
@@ -44,11 +26,10 @@ namespace Global
             => _instance._projectileManager;
 
         public static BasePlayer Player
-            => _instance._player;
+        => _instance._player;
 
         public static SpawnerManager EnemyManager
             => _instance._enemyManager;
-        #endregion
 
         private CanvasManager _canvasManager;
         private SpawnerManager _enemyManager;
@@ -70,6 +51,26 @@ namespace Global
         [SerializeField] private bool _godMode;
         [SerializeField] private bool _nerfPlayer;
 
+        #region Singleton
+        private static GameManager _instance;
+        public static GameManager Instance
+        {
+            get
+            {
+                if (_instance != null)
+                    return _instance;
+                _instance = FindObjectOfType<GameManager>();
+
+                if (_instance != null)
+                    return _instance;
+                var obj = new GameObject("GameManager");
+                _instance = obj.AddComponent<GameManager>();
+
+                return _instance;
+            }
+        }
+        #endregion
+
         private void OnEnable()
         {
             if (_instance != null && Instance != this)
@@ -85,7 +86,58 @@ namespace Global
 
         private void Start()
         {
+            
+        }
+
+        public void StartGame()
+        {
+            if (_player != null)
+            {
+                Debug.LogWarning("Player already exists, game probably running. Trying to start game, what's up??");
+                return;
+            }
+
+            StartGameAsync();
+        }
+
+        public void ReturnToMainMenu()
+        {
+            Deinitialize();
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        }
+
+        private async void StartGameAsync()
+        {
+            // Asynchronous loading of the game scene
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("GameScene");
+
+            asyncLoad.allowSceneActivation = true;
+
+            // NOTE: Since our game is so small, we don't really
+            // need to wait for the loading to finish.
+            // But this is how you would do it if you needed to.
+
+            // While loading we let the game continue
+            while (!asyncLoad.isDone)
+            {
+                Debug.Log("Loading progress: " + asyncLoad.progress);
+                await Task.Delay(100);
+            }
+
+            // Set the game scene as the active scene.
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName("GameScene"));
+
+            // Finally, initialize the game
             Initialize();
+        }
+
+        public void Deinitialize()
+        {
+            Destroy(_player.gameObject);
+            Destroy(_canvasManager.gameObject);
+            Destroy(_enemyManager.gameObject);
+            Destroy(_upgradeManager.gameObject);
+            Destroy(_projectileManager.gameObject);
         }
 
         public void Initialize()
