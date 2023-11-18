@@ -127,6 +127,19 @@ namespace Global
             // Set the game scene as the active scene.
             SceneManager.SetActiveScene(SceneManager.GetSceneByName("GameScene"));
 
+            // We'll use an awaitable task to wait for the player to select a character
+            var characterMenu = FindObjectOfType<CharacterMenu>();
+
+            // If the character menu hasn't been loaded yet, wait for it to load
+            while (characterMenu == null)
+            {
+                await Task.Yield();
+                characterMenu = FindObjectOfType<CharacterMenu>();
+            }
+
+            // Wait for the player to select a character. Handled by the CharacterMenu
+            _playerType = await characterMenu.SelectCharacter();
+            
             // Finally, initialize the game
             Initialize();
         }
