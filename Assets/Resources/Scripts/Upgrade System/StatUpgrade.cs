@@ -9,11 +9,13 @@ public class StatUpgrade : ScriptableObject
     {
         public Stat AffectedStat;
 
+        [Tooltip("Use this to trigger custom events")]
+        public string TriggerName;
+
         [Tooltip("Percentage increase. 20 = +20%")]
         public float Difference;
 
         public readonly float Multiplier => 1.0f + (Difference / 100);
-        //public readonly float Divider => 1.0f - (Difference / 100);
     }
 
     public enum Stat
@@ -26,7 +28,8 @@ public class StatUpgrade : ScriptableObject
         CritDamage,
         CritChance,
         Knockback,
-        Armor
+        Armor,
+        Other
     }
 
     public List<StatChange> StatChanges;

@@ -284,9 +284,24 @@ namespace PlayerLogic
             return Instantiate(_arrowCache);
         }
 
+        static GameObject InstantiateTrailArrow()
+        {
+            return Instantiate(Resources.Load<GameObject>("Prefabs/Projectiles/TrailArrow"));
+        }
+
         public void FireArrow(Vector2 origin, Vector2 target)
         {
-            GameObject projectileObj = InstantiateArrow();
+            GameObject projectileObj;
+
+            if (CheckForTriggerInUpgrades("EyeOfCyclops"))
+            {
+                projectileObj = InstantiateTrailArrow();
+            }
+            else
+            {
+                projectileObj = InstantiateArrow();
+            }
+
             projectileObj.transform.position = transform.position;
 
             var proj = projectileObj.GetComponent<ArrowProjectile>();

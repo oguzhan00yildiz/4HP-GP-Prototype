@@ -12,7 +12,7 @@ namespace Enemies
         public ulong Id
             => Data.GetId();
 
-        [Header("Enemy Stats")] 
+        [Header("Enemy Stats")]
         public string EnemyName;
         public int Health;
         [SerializeField] protected float MoveSpeed;
@@ -23,7 +23,8 @@ namespace Enemies
 
         protected float TimeAtLastAttack;
 
-        [Space(10)] [Header("Spawn Attributes")] 
+        [Space(10)]
+        [Header("Spawn Attributes")]
         [SerializeField] public EnemyData Data;
 
         [Space(10)]
@@ -44,17 +45,58 @@ namespace Enemies
             int originalHealth = Health;
             Health -= amount;
 
-            //StartCoroutine(UpdateHealthBar(originalHealth, Health));
             DisplayDamageNumber(transform.position, amount);
+
+            DoDamageFlash();
 
             if (!damageOrigin.HasValue)
                 return;
 
             // Knockback
-            Vector2 knockback 
+            Vector2 knockback
                 = ((Vector2)transform.position - (Vector2)damageOrigin).normalized * knockbackAmount;
-            
+
             KnockbackVector = knockback;
+        }
+
+        protected virtual void DoDamageFlash()
+        {
+            //Debug.Log("I should be fucking flashing");
+            if (_isFlashing)
+                return;
+            _isFlashing = true;
+            StartCoroutine(DamageFlashCoroutine());
+        }
+
+        private bool _isFlashing;
+        private IEnumerator DamageFlashCoroutine()
+        {
+            var spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+            var originalSprites = new Sprite[spriteRenderers.Length];
+
+            var originalColors = new Color[spriteRenderers.Length];
+
+            for (int i = 0; i < spriteRenderers.Length; i++)
+            {
+                originalColors[i] = spriteRenderers[i].color;
+            }
+
+            foreach (var spriteRenderer in spriteRenderers)
+            {
+                if (spriteRenderer == null)
+                    continue;
+
+                spriteRenderer.color = Color.red;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+
+            for (int i = 0; i < spriteRenderers.Length; i++)
+            {
+                spriteRenderers[i].color = originalColors[i];
+            }
+
+            _isFlashing = false;
         }
 
         // Updates the health bar to the new value with a smooth animation
@@ -149,7 +191,7 @@ namespace Enemies
             Vector2 positionChange = MoveSpeed * Time.fixedDeltaTime * TargetDirection.normalized;
 
             // Slow down if we're close to the target
-            if(TargetDirection.magnitude < AttackRange * 0.75f)
+            if (TargetDirection.magnitude < AttackRange * 0.75f)
                 positionChange = Vector2.Lerp(positionChange, Vector2.zero, 7f * Time.fixedDeltaTime);
 
             // Apply knockback
@@ -160,7 +202,7 @@ namespace Enemies
             KnockbackVector = Vector2.Lerp(KnockbackVector, Vector2.zero, 5f * Time.fixedDeltaTime);
 
             Vector2 newPosition = Rb.position + positionChange;
-            
+
             // Move with rigidbody
             Rb.MovePosition(newPosition);
         }

@@ -76,6 +76,23 @@ namespace PlayerLogic
             DamageEffect(amount);
         }
 
+        protected bool CheckForTriggerInUpgrades(string triggerName)
+        {
+            foreach (var upgrade in StatInfo.Upgrades)
+            {
+                foreach (var statChange in upgrade.StatChanges)
+                {
+                    if (statChange.AffectedStat != StatUpgrade.Stat.Other)
+                        continue;
+
+                    if (statChange.TriggerName == triggerName)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        
         protected virtual void DamageEffect(int damageAmount)
         {
             HealthBar.gameObject.SetActive(true);

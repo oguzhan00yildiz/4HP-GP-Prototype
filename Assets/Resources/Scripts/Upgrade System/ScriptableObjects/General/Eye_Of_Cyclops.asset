@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0470f493bd139f9449de4cb5ce223f97, type: 3}
+  m_Name: Eye_Of_Cyclops
+  m_EditorClassIdentifier: 
+  StatChanges:
+  - AffectedStat: 9
+    TriggerName: EyeOfCyclops
+    Difference: 0
+  UpgradeIcon: {fileID: 21300000, guid: e341641c787a5fc459e70797ac9a5e10, type: 3}
+  UpgradeName: Eye Of Cyclops
+  MinimumWave: 1
+  FlavorText: It's fucking slimy n shit

@@ -5,6 +5,9 @@ using UnityEngine;
 public class ArrowProjectile : Projectile
 {
     private Quaternion _rotation;
+
+    public int PierceCount = 1;
+
     public override void InitializeProjectileWithTransform(Vector2 origin, Transform target, Color? color = null)
     {
         base.InitTransform(origin, target);
@@ -93,6 +96,12 @@ public class ArrowProjectile : Projectile
             GameManager.Instance.EnemyHit(enemyObj, _damage);
         }
 
+        if (PierceCount > 0)
+        {
+            PierceCount--;
+            StartAnimating();
+            yield break;
+        }
         // Destroy the gameObject
         Destroy(gameObject);
     }
